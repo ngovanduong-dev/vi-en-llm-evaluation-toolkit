@@ -106,6 +106,25 @@ def test_validator_rejects_blank_rationale(tmp_path):
     assert any(issue.field == "rationale" for issue in result.issues)
 
 
+def test_validator_rejects_duplicate_ids(tmp_path):
+    first = valid_evaluation_record()
+    second = valid_evaluation_record()
+    second["prompt_id"] = "prompt_test_002"
+    second["response_pair_id"] = "pair_test_002"
+    path = write_jsonl(tmp_path / "duplicate_ids.jsonl", [first, second])
+
+    result = validate_jsonl(path)
+
+    assert not result.is_valid
+    assert result.valid_records == 1
+    assert any(
+        issue.code == "duplicate_id"
+        and issue.field == "id"
+        and issue.line_number == 2
+        for issue in result.issues
+    )
+
+
 @pytest.mark.parametrize("schema_name", ["prompt", "response", "evaluation"])
 def test_sample_jsonl_files_match_registered_schemas(schema_name):
     file_map = {
