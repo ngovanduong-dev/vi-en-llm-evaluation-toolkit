@@ -72,6 +72,7 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
 
     model = SCHEMA_REGISTRY[schema_name]
     issues: list[ValidationIssue] = []
+    seen_ids: set[str] = set()
     total_lines = 0
     valid_records = 0
 
@@ -108,6 +109,19 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
                 issues.extend(_schema_issue(line_number, error) for error in exc.errors())
                 continue
 
+            record_id = payload["id"]
+            if record_id in seen_ids:
+                issues.append(
+                    ValidationIssue(
+                        line_number=line_number,
+                        code="duplicate_id",
+                        field="id",
+                        message=f"Duplicate record id: {record_id}",
+                    )
+                )
+                continue
+
+            seen_ids.add(record_id)
             valid_records += 1
 
     return JsonlValidationResult(
