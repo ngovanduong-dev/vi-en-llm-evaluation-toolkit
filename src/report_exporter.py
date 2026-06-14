@@ -9,6 +9,19 @@ from src.schemas import EvaluationRecord
 from src.scoring import calculate_average_score, summarize_evaluation
 
 
+def _detected_issue_lines(record: EvaluationRecord) -> list[str]:
+    if not record.detected_issues:
+        return ["- No major issues detected."]
+
+    lines = []
+    for issue in record.detected_issues:
+        lines.append(f"- **{issue.category}** ({issue.severity.value}): {issue.description}")
+        if issue.suggested_fix:
+            lines.append(f"  - Suggested fix: {issue.suggested_fix}")
+
+    return lines
+
+
 def evaluation_to_markdown(record: EvaluationRecord) -> str:
     lines = [
         f"# Evaluation Report: {record.id}",
@@ -30,6 +43,7 @@ def evaluation_to_markdown(record: EvaluationRecord) -> str:
         label = field.replace("_", " ").title()
         lines.append(f"| {label} | {score} |")
 
+    lines.extend(["", "## Detected Issues", "", *_detected_issue_lines(record)])
     lines.extend(["", "## Rationale", "", record.rationale, ""])
     return "\n".join(lines)
 

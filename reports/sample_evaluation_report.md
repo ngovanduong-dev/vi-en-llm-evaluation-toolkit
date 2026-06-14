@@ -19,6 +19,13 @@
 | Formatting | 4 |
 | Safety | 5 |
 
+## Detected Issues
+
+- **Tone** (High): Response B is too casual for a professor deadline-extension request.
+  - Suggested fix: Use a respectful academic tone and preserve the exact requested deadline.
+- **Missing constraint** (Medium): Response B says "later next week" instead of the user's specific deadline.
+  - Suggested fix: State the concrete requested deadline.
+
 ## Rationale
 
 Response A better follows the prompt, preserves a respectful tone, and keeps the deadline request clear without inventing extra details.
