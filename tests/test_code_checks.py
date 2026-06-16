@@ -18,7 +18,9 @@ def test_python_syntax_invalid_code():
 
     assert not result.is_valid
     assert result.code == "python_syntax_error"
-    assert result.message == "Python syntax error."
+    assert result.message == "Python syntax error: invalid syntax."
+    assert result.line_number == 1
+    assert result.column == 12
 
 
 def test_validate_json_text_valid():

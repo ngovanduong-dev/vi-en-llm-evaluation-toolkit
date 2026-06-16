@@ -36,11 +36,13 @@ def check_python_syntax(source: str) -> CheckResult:
 
     try:
         ast.parse(source)
-    except SyntaxError:
+    except SyntaxError as exc:
         return CheckResult(
             is_valid=False,
             code="python_syntax_error",
-            message="Python syntax error.",
+            message=f"Python syntax error: {exc.msg}.",
+            line_number=exc.lineno,
+            column=exc.offset,
         )
 
     return CheckResult(
