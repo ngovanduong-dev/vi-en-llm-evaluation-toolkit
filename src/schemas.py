@@ -3,9 +3,18 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+
+
+def _reject_blank_string(value: str) -> str:
+    if not value.strip():
+        raise ValueError("value cannot be blank")
+    return value
+
+
+NonBlankStr = Annotated[str, Field(min_length=1), AfterValidator(_reject_blank_string)]
 
 
 class Language(str, Enum):
@@ -40,10 +49,10 @@ class DetectedIssue(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    category: str = Field(min_length=1)
+    category: NonBlankStr
     severity: Severity
-    description: str = Field(min_length=1)
-    suggested_fix: str | None = None
+    description: NonBlankStr
+    suggested_fix: NonBlankStr | None = None
 
 
 class RubricScores(BaseModel):
@@ -77,18 +86,11 @@ class PromptRecord(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    id: str = Field(min_length=1)
+    id: NonBlankStr
     language: Language
     task_type: TaskType
-    prompt: str = Field(min_length=1)
-    expected_constraints: list[str] = Field(default_factory=list)
-
-    @field_validator("expected_constraints")
-    @classmethod
-    def constraints_must_not_be_blank(cls, values: list[str]) -> list[str]:
-        if any(not value.strip() for value in values):
-            raise ValueError("expected_constraints cannot contain blank items")
-        return values
+    prompt: NonBlankStr
+    expected_constraints: list[NonBlankStr] = Field(default_factory=list)
 
 
 class ResponsePairRecord(BaseModel):
@@ -96,12 +98,12 @@ class ResponsePairRecord(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    id: str = Field(min_length=1)
-    prompt_id: str = Field(min_length=1)
-    response_a: str = Field(min_length=1)
-    response_b: str = Field(min_length=1)
-    model_a: str | None = None
-    model_b: str | None = None
+    id: NonBlankStr
+    prompt_id: NonBlankStr
+    response_a: NonBlankStr
+    response_b: NonBlankStr
+    model_a: NonBlankStr | None = None
+    model_b: NonBlankStr | None = None
 
 
 class EvaluationRecord(BaseModel):
@@ -109,22 +111,15 @@ class EvaluationRecord(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    id: str = Field(min_length=1)
-    prompt_id: str = Field(min_length=1)
-    response_pair_id: str = Field(min_length=1)
+    id: NonBlankStr
+    prompt_id: NonBlankStr
+    response_pair_id: NonBlankStr
     language: Language
     task_type: TaskType
     winner: Literal["A", "B", "Tie"]
     rubric_scores: RubricScores
     detected_issues: list[DetectedIssue] = Field(default_factory=list)
-    rationale: str = Field(min_length=1)
-
-    @field_validator("rationale")
-    @classmethod
-    def rationale_must_contain_real_text(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("rationale cannot be blank")
-        return value
+    rationale: NonBlankStr
 
 
 SCHEMA_REGISTRY: dict[str, type[BaseModel]] = {
