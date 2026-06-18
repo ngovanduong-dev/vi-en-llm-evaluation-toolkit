@@ -106,6 +106,17 @@ def test_validator_rejects_blank_rationale(tmp_path):
     assert any(issue.field == "rationale" for issue in result.issues)
 
 
+def test_validator_rejects_whitespace_only_record_id(tmp_path):
+    row = valid_evaluation_record()
+    row["id"] = "   "
+    path = write_jsonl(tmp_path / "blank_id.jsonl", [row])
+
+    result = validate_jsonl(path)
+
+    assert not result.is_valid
+    assert any(issue.field == "id" for issue in result.issues)
+
+
 def test_validator_rejects_duplicate_ids(tmp_path):
     first = valid_evaluation_record()
     second = valid_evaluation_record()
