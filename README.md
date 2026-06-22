@@ -14,6 +14,13 @@ This project simulates common AI training workflows:
 - Review Vietnamese-English language quality and localization issues.
 - Validate JSONL datasets before they are used for evaluation work.
 
+## Portfolio Samples
+
+The synthetic portfolio index lives in
+[`portfolio_samples/README.md`](portfolio_samples/README.md). It defines the
+planned human-readable sample categories that will complement the toolkit code,
+tests, rubrics, JSONL data, and reports.
+
 ## Current Scope
 
 The current milestone includes:
