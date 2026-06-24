@@ -31,6 +31,15 @@ technical reviewers quickly see evaluator judgment in action:
 | Synthetic personalization evaluation | `portfolio_samples/personalization_evaluation_synthetic/` | Fake-profile personalization review, missing personalization, unsupported inference, privacy-safe reasoning | Future issue |
 | Technical response review | `portfolio_samples/technical_response_review/` | Python, SQL, JSON, API explanation review, edge cases, unsupported technical claims | `#22` |
 
+## Available Samples
+
+### Vietnamese-English Response Evaluation
+
+- [Vietnamese-English response comparison](vi_en_response_evaluation/01_response_comparison.md)
+- [Instruction-following review](vi_en_response_evaluation/02_instruction_following_review.md)
+- [Hallucination detection review](vi_en_response_evaluation/03_hallucination_detection.md)
+- [Vietnamese localization QA review](vi_en_response_evaluation/04_localization_qa_review.md)
+
 ## Sample Quality Standard
 
 Each sample should be:
@@ -117,9 +126,9 @@ generalized, synthetic examples.
 
 ## Current Status
 
-This index is the first portfolio-layer step. The actual samples will be added
-in small follow-up PRs so each category can be reviewed for quality,
-specificity, and confidentiality.
+The Vietnamese-English response evaluation category now has four synthetic
+samples. Additional categories will be added in small follow-up PRs so each
+group can be reviewed for quality, specificity, and confidentiality.
 
 **Synthetic-only note:** This directory is for original portfolio-safe examples
 only. It must not contain private platform data, internal guidelines, client
