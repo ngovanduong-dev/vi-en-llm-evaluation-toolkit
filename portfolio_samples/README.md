@@ -40,6 +40,13 @@ technical reviewers quickly see evaluator judgment in action:
 - [Hallucination detection review](vi_en_response_evaluation/03_hallucination_detection.md)
 - [Vietnamese localization QA review](vi_en_response_evaluation/04_localization_qa_review.md)
 
+### Prompt and Rubric Writing
+
+- [Vietnamese long complex prompt](prompt_rubric_writing/01_vietnamese_long_complex_prompt.md)
+- [Fine-grained rubric](prompt_rubric_writing/02_fine_grained_rubric.md)
+- [Explicit vs implicit criteria](prompt_rubric_writing/03_explicit_vs_implicit_criteria.md)
+- [Objective vs subjective criteria](prompt_rubric_writing/04_objective_vs_subjective_criteria.md)
+
 ## Sample Quality Standard
 
 Each sample should be:
@@ -126,9 +133,10 @@ generalized, synthetic examples.
 
 ## Current Status
 
-The Vietnamese-English response evaluation category now has four synthetic
-samples. Additional categories will be added in small follow-up PRs so each
-group can be reviewed for quality, specificity, and confidentiality.
+The Vietnamese-English response evaluation and prompt/rubric writing categories
+now have synthetic samples. Additional categories will be added in small
+follow-up PRs so each group can be reviewed for quality, specificity, and
+confidentiality.
 
 **Synthetic-only note:** This directory is for original portfolio-safe examples
 only. It must not contain private platform data, internal guidelines, client
