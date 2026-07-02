@@ -47,6 +47,13 @@ technical reviewers quickly see evaluator judgment in action:
 - [Explicit vs implicit criteria](prompt_rubric_writing/03_explicit_vs_implicit_criteria.md)
 - [Objective vs subjective criteria](prompt_rubric_writing/04_objective_vs_subjective_criteria.md)
 
+### Technical Response Review
+
+- [Python code review](technical_response_review/01_python_code_review.md)
+- [SQL query review](technical_response_review/02_sql_query_review.md)
+- [JSON output validation review](technical_response_review/03_json_output_validation.md)
+- [REST API explanation review](technical_response_review/04_api_response_review.md)
+
 ## Sample Quality Standard
 
 Each sample should be:
@@ -133,10 +140,10 @@ generalized, synthetic examples.
 
 ## Current Status
 
-The Vietnamese-English response evaluation and prompt/rubric writing categories
-now have synthetic samples. Additional categories will be added in small
-follow-up PRs so each group can be reviewed for quality, specificity, and
-confidentiality.
+The Vietnamese-English response evaluation, prompt/rubric writing, and
+technical response review categories now have synthetic samples. Additional
+categories will be added in small follow-up PRs so each group can be reviewed
+for quality, specificity, and confidentiality.
 
 **Synthetic-only note:** This directory is for original portfolio-safe examples
 only. It must not contain private platform data, internal guidelines, client
