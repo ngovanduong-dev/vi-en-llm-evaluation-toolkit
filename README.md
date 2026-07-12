@@ -1,5 +1,7 @@
 # Vietnamese-English LLM Evaluation Toolkit & Synthetic Portfolio
 
+[![tests](https://github.com/ngovanduong-dev/vi-en-llm-evaluation-toolkit/actions/workflows/tests.yml/badge.svg)](https://github.com/ngovanduong-dev/vi-en-llm-evaluation-toolkit/actions/workflows/tests.yml)
+
 This project demonstrates a synthetic AI training workflow: creating evaluation
 records, validating JSONL datasets, scoring prompt-response pairs with rubrics,
 reviewing Vietnamese-English language quality, checking coding-response issues,
@@ -83,6 +85,8 @@ Technical response review:
   coding response review, and prompt/rubric quality.
 - Pytest coverage for the core validation, scoring, export, schema, and coding
   check behavior.
+- GitHub Actions workflow for tests and sample JSONL validation on pull
+  requests and pushes to `main`.
 
 ## Project Structure
 
@@ -178,11 +182,12 @@ Coding checks live in [`src/code_checks.py`](src/code_checks.py). They support:
 ## Current Status
 
 The current repo is a toolkit plus synthetic portfolio. It includes code,
-tests, sample JSONL data, rubrics, portfolio samples, and a sample report.
+tests, GitHub Actions, sample JSONL data, rubrics, portfolio samples, and a
+sample report.
 
-Planned follow-up work includes GitHub Actions, a Streamlit comparison UI,
-README screenshots, additional portfolio-safe documentation, and a release tag.
-Those items are not claimed as complete yet.
+Planned follow-up work includes a Streamlit comparison UI, README screenshots,
+additional portfolio-safe documentation, and a release tag. Those items are not
+claimed as complete yet.
 
 ## Confidentiality Note
 
