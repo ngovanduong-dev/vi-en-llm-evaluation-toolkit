@@ -13,3 +13,7 @@ env/
 
 reports/*.csv
 reports/generated_*.md
+
+# Private/local evaluation material must never be committed.
+data/private/
+artifacts/local/
