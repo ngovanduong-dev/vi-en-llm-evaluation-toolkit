@@ -43,20 +43,6 @@ README
 -> reports/sample_evaluation_report.md
 ```
 
-For project governance and the planned professionalization work:
-
-```text
-README
--> docs/START_HERE.md
--> AGENTS.md
--> docs/02_ROADMAP_24_WEEKS.md
--> planning/BACKLOG.md
-```
-
-The governance documents describe both the implemented baseline and a target
-architecture. Anything labeled **TARGET**, **PLANNED**, or **NOT YET
-IMPLEMENTED** is not a current repository capability.
-
 ## Featured Portfolio Samples
 
 The portfolio index is available at
@@ -106,8 +92,6 @@ Technical response review:
 
 ```text
 data/                 Synthetic JSONL records.
-docs/                 Governance, architecture, methodology, and roadmap.
-planning/             Backlog, milestones, and contribution templates.
 portfolio_samples/    Human-readable synthetic portfolio samples.
 reports/              Sample exported evaluator report.
 rubrics/              Public-safe evaluation rubrics.
@@ -201,14 +185,8 @@ The current repo is a toolkit plus synthetic portfolio. It includes code,
 tests, GitHub Actions, sample JSONL data, rubrics, portfolio samples, and a
 sample report.
 
-The target roadmap first establishes governance and a reproducible baseline,
-then builds the evaluation core, benchmark and human-annotation workflow,
-calibration, and experiment engine. Sandboxed code evaluation, agent
-evaluation, and any Streamlit/UI work come later. See
-[`docs/START_HERE.md`](docs/START_HERE.md),
-[`docs/02_ROADMAP_24_WEEKS.md`](docs/02_ROADMAP_24_WEEKS.md), and
-[`planning/BACKLOG.md`](planning/BACKLOG.md). These planned capabilities are not
-claimed as implemented.
+Future work may improve benchmark rigor, reproducibility, and evaluator
+workflows; planned work is not presented as a current capability.
 
 ## Confidentiality Note
 
