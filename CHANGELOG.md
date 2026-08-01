@@ -9,10 +9,16 @@ The project does not yet have a tagged release history.
 
 ### Added
 
-- Repository-local governance, architecture, methodology, security, planning,
-  and contribution documentation for GOV-001.
+- Public contribution and security guidance, plus GitHub issue and pull-request
+  templates.
 
 ### Changed
 
-- Clarified the boundary between implemented capabilities and the planned
-  professional evaluation-lab roadmap.
+- Simplified public documentation to focus on implemented features and
+  reviewer-facing materials.
+- Protected private and local evaluation material through ignored data and
+  artifact directories.
+
+### Removed
+
+- Removed internal project-planning documents from the public repository.

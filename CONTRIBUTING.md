@@ -1,17 +1,17 @@
 # Contributing
 
 Thank you for helping improve the Vietnamese-English LLM Evaluation Toolkit.
-Start with [`docs/START_HERE.md`](docs/START_HERE.md) and follow the repository
-rules in [`AGENTS.md`](AGENTS.md).
+Review the current implementation and open public issues before proposing a
+change.
 
 ## Before starting
 
-1. Select one issue from [`planning/BACKLOG.md`](planning/BACKLOG.md).
+1. Choose an existing public GitHub issue or open a focused issue before
+   implementation.
 2. Inspect the current implementation, tests, Git status, and relevant history.
-3. Read the architecture, methodology, security, and Definition of Done
-   documents referenced by the issue.
-4. State the acceptance criteria, compatibility impact, risks, and validation
-   plan before changing files.
+3. Define the scope, non-goals, acceptance criteria, compatibility impact, and
+   security or privacy risks.
+4. State the validation plan before changing files.
 
 Use a dedicated branch and keep one issue or tightly coupled vertical slice per
 pull request. Do not mix unrelated cleanup with feature work.

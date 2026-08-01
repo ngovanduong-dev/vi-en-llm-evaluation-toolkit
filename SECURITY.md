@@ -6,9 +6,9 @@ The implemented repository validates structured records and parses Python
 syntax. It does **not** provide a restricted execution sandbox and must not be
 used to execute untrusted generated code.
 
-Sandboxed code evaluation, controlled agent tools, dependency auditing, and
-additional CI security controls are target capabilities described in the
-roadmap. They are not implemented by this governance change.
+Any future execution capability must undergo security review and use
+appropriate isolation before it is enabled. A planned execution capability
+must not be described as a current repository feature.
 
 ## Reporting a vulnerability
 
@@ -40,7 +40,3 @@ For a suspected secret exposure, private-data leak, or sandbox escape:
 5. identify affected commits and artifacts;
 6. document root cause and residual risk;
 7. add a regression test before declaring remediation complete.
-
-See [`docs/09_SECURITY_SANDBOX.md`](docs/09_SECURITY_SANDBOX.md) and
-[`docs/10_DATA_GOVERNANCE_NDA.md`](docs/10_DATA_GOVERNANCE_NDA.md) for the
-target security and data-governance standards.
