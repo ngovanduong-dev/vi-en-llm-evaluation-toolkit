@@ -99,6 +99,17 @@ src/                  Toolkit implementation modules.
 tests/                Pytest coverage for core behavior.
 ```
 
+## Reproducible Baseline Inventory
+
+The repository's machine-readable current-state inventory is available at
+[`artifacts/baseline/current_state.json`](artifacts/baseline/current_state.json).
+Generate or verify it with:
+
+```bash
+python -B scripts/generate_baseline_inventory.py generate
+python -B scripts/generate_baseline_inventory.py check
+```
+
 ## Quick Start
 
 ```bash
