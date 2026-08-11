@@ -9,6 +9,8 @@ The project does not yet have a tagged release history.
 
 ### Added
 
+- Deterministic, machine-readable baseline inventory with generate and drift-check
+  commands.
 - Public contribution and security guidance, plus GitHub issue and pull-request
   templates.
 
