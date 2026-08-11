@@ -230,7 +230,7 @@ def test_canonical_json_bytes_are_stable_utf8_lf():
     assert json.loads(first_bytes.decode("utf-8")) == first
 
 
-def test_input_hash_uses_raw_bytes_and_sorted_manifest(tmp_path):
+def test_input_hash_uses_canonical_text_and_sorted_manifest(tmp_path):
     first = _write(tmp_path / "first.txt", "first\n")
     second = _write(tmp_path / "second.txt", "second\n")
 
@@ -239,11 +239,54 @@ def test_input_hash_uses_raw_bytes_and_sorted_manifest(tmp_path):
 
     assert forward == reverse
     assert [entry["path"] for entry in forward["files"]] == ["first.txt", "second.txt"]
-    assert forward["files"][0]["sha256"] == hashlib.sha256(first.read_bytes()).hexdigest()
+    assert forward["normalization"] == baseline.INPUT_HASH_NORMALIZATION
+    assert forward["files"][0]["sha256"] == hashlib.sha256(b"first\n").hexdigest()
 
     second.write_bytes(b"changed\n")
     changed = baseline.build_input_hash(tmp_path, ("first.txt", "second.txt"))
     assert changed["value"] != forward["value"]
+
+
+def test_input_hash_normalizes_lf_crlf_and_lone_cr(tmp_path):
+    variants = {
+        "cr.txt": b"first\rsecond\r",
+        "crlf.txt": b"first\r\nsecond\r\n",
+        "lf.txt": b"first\nsecond\n",
+    }
+    for name, content in variants.items():
+        (tmp_path / name).write_bytes(content)
+
+    manifest = baseline.build_input_hash(tmp_path, variants)
+
+    assert len({entry["sha256"] for entry in manifest["files"]}) == 1
+    assert manifest["files"][0]["sha256"] == hashlib.sha256(b"first\nsecond\n").hexdigest()
+
+
+def test_aggregate_hash_is_equal_for_lf_and_crlf_fixtures(tmp_path):
+    lf_root = tmp_path / "lf"
+    crlf_root = tmp_path / "crlf"
+    _write(lf_root / "one.txt", "one\ntwo\n")
+    _write(lf_root / "two.txt", "ba\n")
+    (crlf_root / "one.txt").parent.mkdir(parents=True)
+    (crlf_root / "one.txt").write_bytes(b"one\r\ntwo\r\n")
+    (crlf_root / "two.txt").write_bytes("ba\r\n".encode("utf-8"))
+
+    lf_manifest = baseline.build_input_hash(lf_root, ("one.txt", "two.txt"))
+    crlf_manifest = baseline.build_input_hash(crlf_root, ("one.txt", "two.txt"))
+
+    assert lf_manifest == crlf_manifest
+
+
+def test_input_hash_rejects_bom_and_invalid_utf8(tmp_path):
+    bom_path = tmp_path / "bom.txt"
+    invalid_path = tmp_path / "invalid.txt"
+    bom_path.write_bytes(b"\xef\xbb\xbftext\n")
+    invalid_path.write_bytes(b"\xff\xfe")
+
+    with pytest.raises(baseline.InventoryError, match="BOM is not allowed"):
+        baseline.build_input_hash(tmp_path, ("bom.txt",))
+    with pytest.raises(baseline.InventoryError, match="not valid UTF-8 text"):
+        baseline.build_input_hash(tmp_path, ("invalid.txt",))
 
 
 def test_artifact_is_rejected_as_a_hash_input(tmp_path):

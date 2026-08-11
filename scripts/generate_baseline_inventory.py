@@ -19,6 +19,7 @@ ARTIFACT_SCHEMA_VERSION = 1
 ARTIFACT_PATH = "artifacts/baseline/current_state.json"
 GENERATOR_PATH = "scripts/generate_baseline_inventory.py"
 PLUGIN_AUTOLOAD_ENV = "PYTEST_DISABLE_PLUGIN_AUTOLOAD"
+INPUT_HASH_NORMALIZATION = "utf-8-lf"
 
 JSONL_SCHEMA_BINDINGS: tuple[tuple[str, str], ...] = (
     ("data/sample_evaluations.jsonl", "evaluation"),
@@ -440,8 +441,27 @@ def _compact_canonical_json(value: object) -> bytes:
     ).encode("utf-8")
 
 
+def _canonical_utf8_lf_bytes(path: Path) -> bytes:
+    """Read strict UTF-8 without a BOM and normalize CRLF or lone CR to LF."""
+
+    try:
+        content = path.read_bytes()
+    except OSError as exc:
+        raise InventoryError(
+            f"Unable to read hash input {path}: {type(exc).__name__}: {exc}"
+        ) from exc
+    if content.startswith(b"\xef\xbb\xbf"):
+        raise InventoryError(f"UTF-8 BOM is not allowed in hash input: {path}")
+    try:
+        text = content.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise InventoryError(f"Hash input is not valid UTF-8 text: {path}") from exc
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    return normalized.encode("utf-8")
+
+
 def build_input_hash(root: Path, input_paths: Iterable[str]) -> dict[str, Any]:
-    """Hash raw public input bytes and a canonical sorted hash manifest."""
+    """Hash canonical UTF-8/LF public content and its sorted manifest."""
 
     paths = _ensure_unique_paths(input_paths, label="hash input")
     if ARTIFACT_PATH.casefold() in {path.casefold() for path in paths}:
@@ -450,13 +470,14 @@ def build_input_hash(root: Path, input_paths: Iterable[str]) -> dict[str, Any]:
     files: list[dict[str, str]] = []
     for relative_path in paths:
         path, canonical_path = _repository_file(root, root / Path(relative_path))
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        digest = hashlib.sha256(_canonical_utf8_lf_bytes(path)).hexdigest()
         files.append({"path": canonical_path, "sha256": digest})
 
     aggregate = hashlib.sha256(_compact_canonical_json(files)).hexdigest()
     return {
         "algorithm": "sha256",
         "files": files,
+        "normalization": INPUT_HASH_NORMALIZATION,
         "value": aggregate,
     }
 

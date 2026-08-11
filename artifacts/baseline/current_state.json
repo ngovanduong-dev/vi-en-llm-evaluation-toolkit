@@ -65,103 +65,103 @@
       "files": [
         {
           "path": "data/sample_evaluations.jsonl",
-          "sha256": "5d44ff6595cf1b6b3adb736a1ac5b341b15319486650f72a0364846a4099bbe6"
+          "sha256": "4108e9693047aac73413bfea210dc63f9c16c996fa8f38d96f7d6e7fb141cc51"
         },
         {
           "path": "data/sample_prompts.jsonl",
-          "sha256": "02a10f03766bd3ba24e17408267cfa5d363d5fd2f887f41a3f296e313513c747"
+          "sha256": "ca7025545a5cb1804d2d2fc5dfdd37d9959f2202a32f5d949d3fdcd6dfb0440b"
         },
         {
           "path": "data/sample_responses.jsonl",
-          "sha256": "26c19a6d1dd8cc6130e27bf3d26db441316bfa60aac2ef695900f6048b42d9a5"
+          "sha256": "5afc8609b40e9af70b55c1da9a3b304888a1498f16200fedebdd3dc3bed0d285"
         },
         {
           "path": "portfolio_samples/prompt_rubric_writing/01_vietnamese_long_complex_prompt.md",
-          "sha256": "01cdf11cc534be592645e1bddcaabfc74f86adea502d6c981da83a940914f04e"
+          "sha256": "5b971f00b965570ecba3056fa597ada654c7e721a1b2f006a50d42e501b8f43c"
         },
         {
           "path": "portfolio_samples/prompt_rubric_writing/02_fine_grained_rubric.md",
-          "sha256": "7cbc2f9eef0064bc73fc96153ab2f57b13b7fcbc28e5c681822f64b501f57633"
+          "sha256": "4e0bf3b969e892717b4656ce86960c4f66b3a1d060c51d925964eda25a0c3b74"
         },
         {
           "path": "portfolio_samples/prompt_rubric_writing/03_explicit_vs_implicit_criteria.md",
-          "sha256": "2f9196e2ffc2d560a16fa3c17d79c0e98a0c8f56af3f2a8487bc922d7e13a98d"
+          "sha256": "fc66b9a428c0527742f4671673e5224efdb17a725dd63560e1e8d5eedf31a483"
         },
         {
           "path": "portfolio_samples/prompt_rubric_writing/04_objective_vs_subjective_criteria.md",
-          "sha256": "d37a5f37c0296ecfdae8392f16e73683c8541d14e949a1b75df0e2c525b44569"
+          "sha256": "ca145541ba90b55af674f8764c7e107aadc0c0e2654424c0d80b846ad8f2b706"
         },
         {
           "path": "portfolio_samples/technical_response_review/01_python_code_review.md",
-          "sha256": "0acd0d1976d2f285cf2fa6d9fb2656734d8688ab330fbf227cc0b165b8aedb96"
+          "sha256": "10616eb74a1200310dda70dacb278f3c121afcb3c3346035c8ab3c0452e3ee8d"
         },
         {
           "path": "portfolio_samples/technical_response_review/02_sql_query_review.md",
-          "sha256": "79ceb6bb15fd13a3ce6368b695f2dbc8bd67b6d8331b8ad09f4a28a43ed77960"
+          "sha256": "b9be87b02872281f9995f5a018ed1d9d2faa58482b533451d2629eb931996a32"
         },
         {
           "path": "portfolio_samples/technical_response_review/03_json_output_validation.md",
-          "sha256": "c5efa7e33d5f0cd7f71374fa738b517933a31fabad12f0a580b1011ffc97b6ae"
+          "sha256": "93cea3bc02547906096dbe0be167b9327bd6fe820ab9ea0c8ae14e5eaffeef51"
         },
         {
           "path": "portfolio_samples/technical_response_review/04_api_response_review.md",
-          "sha256": "7da0dbbc8daef88be3660b8e054cfbfa52f3660b2229d73a13230ea363c6fc23"
+          "sha256": "3f50e7f7099e8cd0c1d9b664e5513c2c83e9e4d8281de2431584573eb2147ca8"
         },
         {
           "path": "portfolio_samples/vi_en_response_evaluation/01_response_comparison.md",
-          "sha256": "b7d60a6c55e88aad1f4c84e54b26fa6fa2ace0ac29a71283cad5c5e435a0a0e1"
+          "sha256": "294bca0d7e520516016471737598436401543211ca371350979c7e80ba0faf6c"
         },
         {
           "path": "portfolio_samples/vi_en_response_evaluation/02_instruction_following_review.md",
-          "sha256": "577cc4d5f824b5077e103c69f71ca2a24549d2d948603c2d15639b8620aac38e"
+          "sha256": "c87e201534cc2ccd0183d237988a3b2e1fb41d2846617f33fa4d3899a8cddbc2"
         },
         {
           "path": "portfolio_samples/vi_en_response_evaluation/03_hallucination_detection.md",
-          "sha256": "4187f7878e768c5d04934e94d96e6035af4b766ab2c4d4816a38e1aaa2c96ac9"
+          "sha256": "1f4d78566afefcfbfd64a24920c892f04f14cf28b400b9dd9d8e24a42f364319"
         },
         {
           "path": "portfolio_samples/vi_en_response_evaluation/04_localization_qa_review.md",
-          "sha256": "0d1d46a25a3526b77ac4a0cba9b5b8864517498116740a61bf717d2d571ad9dd"
+          "sha256": "027a9f2e0fe5fcd2151b2406d4adb98418713469708311dbffe764fb56b7f1db"
         },
         {
           "path": "pytest.ini",
-          "sha256": "82fd55d62e39ad5dc83c58bd005c337e4e9810ef96f7356c370d7069de775a16"
+          "sha256": "6c6ccf864e8f2d2e0223ee8e39bfde660c12435aa37d81e2b14000a6bee15003"
         },
         {
           "path": "requirements.txt",
-          "sha256": "176a2e6c232439d19a9dfd981933d772a80da196b825de5c336d410409596e64"
+          "sha256": "dc693b95ee4654b08f97ef366efeccfdeedf495a994291c4f78a2961abc46684"
         },
         {
           "path": "rubrics/coding_response_rubric.md",
-          "sha256": "87095aa99e17c8ddd68b7592c937cc06afe6df875b9b9a9e039f3d64d5fec98f"
+          "sha256": "7a4dbe28d07d9d9bd53d36ff10e461aef8b5fd4f351d94ed2190dd6d47eae903"
         },
         {
           "path": "rubrics/general_response_rubric.md",
-          "sha256": "1be280289ff13032f80200f4a47ace15ef1361bc3660dfd775f8b8348fc889cf"
+          "sha256": "720949f54da470a7b2bc10aa429022428dc138035551195d42cb0826c208a265"
         },
         {
           "path": "rubrics/prompt_rubric_quality_rubric.md",
-          "sha256": "b8d03ff6e6326eeaa77fbcf8b9bb45918ccca5642bffb48faab73c71d79db2ff"
+          "sha256": "7acce68115f7231073342dff4ea17be5a324725d8361539af7f80f62b201200e"
         },
         {
           "path": "rubrics/vi_en_language_qa_rubric.md",
-          "sha256": "92b6e597d6eca4aa1c757d20e70815d9cbddce6f5eba6af5f9a6f3e00a87eb6b"
+          "sha256": "568da7df2c0f513a4cceb748a07404cc0eb423e32039e596bf03901942b1c2eb"
         },
         {
           "path": "scripts/generate_baseline_inventory.py",
-          "sha256": "5cb785ba4f33ba53e4116f986867b513fa04034bfbf8b66432088b7b0421573b"
+          "sha256": "759e141f58546ef1ca425fe0f5f1e151385556b960d07345a5dcf4fed8e17752"
         },
         {
           "path": "src/__init__.py",
-          "sha256": "a876f086912759ce72a5e2400f7e5bb7cad0a347491aba48742b40a7c57566f3"
+          "sha256": "b07665781fdc59b0e6baa84089f34b9b072b1b7145c4b7798132159a2f5eda54"
         },
         {
           "path": "src/jsonl_validator.py",
-          "sha256": "c4f9a6c9c679f19eef9ae9d9d596f33ec491bf8aac278577cf25f75dc93271b7"
+          "sha256": "b17e50bb5ef7703cf38de33962bd3e965742edb41583c92d4050c011445d67fe"
         },
         {
           "path": "src/schemas.py",
-          "sha256": "6db9b4b38781ff68e82289aab8630a62847726df67d924ef39a5a531dfbe2724"
+          "sha256": "ff8eaefaa840e79597bb4ff7341f3517803b25527a2577386a10d4c837599df3"
         },
         {
           "path": "tests/__init__.py",
@@ -169,30 +169,31 @@
         },
         {
           "path": "tests/test_baseline_inventory.py",
-          "sha256": "f8dd9ba324a75448200579137124f174a27f6202bd5382b25c13e58d6cd81586"
+          "sha256": "7291f2ed5a0c282f370c8150a0c4b11c2fe7ea87e342ccab7a3a6a61fac5c6c9"
         },
         {
           "path": "tests/test_code_checks.py",
-          "sha256": "f86c7129be6e7f56914fa167f79fc96828df951e29a5ea0cb83ba290489debae"
+          "sha256": "5b5b5003aae248874d5e1fc9ddf58e8204e0f49c9b687a0668c5dd675b74630e"
         },
         {
           "path": "tests/test_jsonl_validator.py",
-          "sha256": "dd21474ea65d0ba04c8195dba1039fc5fa595c5414cb945bf251ecb50c244216"
+          "sha256": "5a94384e70dc79cbb0a56b2151517c07b3064bb60467eecaab3c191c952fbfb8"
         },
         {
           "path": "tests/test_report_exporter.py",
-          "sha256": "1ce019621dba4943670c9f9e42e5199c40bccd73d7b22503df0fc28a809bf052"
+          "sha256": "9147b54c48afe625040814e32d8de07a386dbffe75d8424edf9c035a366ad9cb"
         },
         {
           "path": "tests/test_schemas.py",
-          "sha256": "1d95333376bd46b296fcc11eebf6f8c04a34128d2fa0fcb33ac9c3eafdcde2e6"
+          "sha256": "e546948186a802fdd6e36e4fbcf5dc951cca3701d93e1f05065e74d81893b2f7"
         },
         {
           "path": "tests/test_scoring.py",
-          "sha256": "9130e0a3b71f2018994b9afdedcbb14160026873b209db655a8249db26166a76"
+          "sha256": "f3aac2b8feffc7b57e25cb5d1753ac0b791e9858c8c8d6de566b472f9f7ec773"
         }
       ],
-      "value": "16b8f60392d0856840de85fde57bfb011cfc5a9500ac52de50fe11a9df6f7142"
+      "normalization": "utf-8-lf",
+      "value": "6bda58b6e20d5ebda1e76dbfc37ef23b29f43c69cd8d7764b2803212de06420a"
     }
   },
   "rubrics": {
@@ -229,7 +230,7 @@
   },
   "status": "valid",
   "tests": {
-    "collected_test_case_count": 67,
+    "collected_test_case_count": 70,
     "collection": {
       "cache_provider": false,
       "external_plugin_autoload": false,
@@ -239,7 +240,7 @@
     "file_count": 6,
     "files": [
       {
-        "collected_test_case_count": 23,
+        "collected_test_case_count": 26,
         "path": "tests/test_baseline_inventory.py"
       },
       {
@@ -264,6 +265,7 @@
       }
     ],
     "nodeids": [
+      "tests/test_baseline_inventory.py::test_aggregate_hash_is_equal_for_lf_and_crlf_fixtures",
       "tests/test_baseline_inventory.py::test_artifact_is_rejected_as_a_hash_input",
       "tests/test_baseline_inventory.py::test_canonical_json_bytes_are_stable_utf8_lf",
       "tests/test_baseline_inventory.py::test_check_missing_and_mismatch_return_drift_code",
@@ -272,7 +274,9 @@
       "tests/test_baseline_inventory.py::test_committed_artifact_matches_generator",
       "tests/test_baseline_inventory.py::test_document_discovery_excludes_indexes",
       "tests/test_baseline_inventory.py::test_generate_is_byte_stable_and_check_does_not_write",
-      "tests/test_baseline_inventory.py::test_input_hash_uses_raw_bytes_and_sorted_manifest",
+      "tests/test_baseline_inventory.py::test_input_hash_normalizes_lf_crlf_and_lone_cr",
+      "tests/test_baseline_inventory.py::test_input_hash_rejects_bom_and_invalid_utf8",
+      "tests/test_baseline_inventory.py::test_input_hash_uses_canonical_text_and_sorted_manifest",
       "tests/test_baseline_inventory.py::test_invalid_runtime_registry_is_rejected[registry0]",
       "tests/test_baseline_inventory.py::test_invalid_runtime_registry_is_rejected[registry1]",
       "tests/test_baseline_inventory.py::test_invalid_runtime_registry_is_rejected[registry2]",
