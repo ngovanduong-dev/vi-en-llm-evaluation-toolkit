@@ -1,7 +1,12 @@
 import pytest
 
-from src.schemas import EvaluationRecord
-from src.scoring import calculate_average_score, normalize_winner, score_band, summarize_evaluation
+from vi_en_eval.schemas import EvaluationRecord
+from vi_en_eval.scoring import (
+    calculate_average_score,
+    normalize_winner,
+    score_band,
+    summarize_evaluation,
+)
 
 
 def sample_record() -> EvaluationRecord:

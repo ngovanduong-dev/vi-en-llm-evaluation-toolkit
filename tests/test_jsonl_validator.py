@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from src.jsonl_validator import validate_jsonl
+from vi_en_eval.jsonl_validator import main, validate_jsonl
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> Path:
@@ -129,9 +129,7 @@ def test_validator_rejects_duplicate_ids(tmp_path):
     assert not result.is_valid
     assert result.valid_records == 1
     assert any(
-        issue.code == "duplicate_id"
-        and issue.field == "id"
-        and issue.line_number == 2
+        issue.code == "duplicate_id" and issue.field == "id" and issue.line_number == 2
         for issue in result.issues
     )
 
@@ -147,3 +145,39 @@ def test_sample_jsonl_files_match_registered_schemas(schema_name):
     result = validate_jsonl(file_map[schema_name], schema_name=schema_name)
 
     assert result.is_valid
+
+
+def test_validator_rejects_unknown_schema():
+    with pytest.raises(ValueError, match="Unknown schema 'unknown'"):
+        validate_jsonl("data/sample_evaluations.jsonl", schema_name="unknown")
+
+
+def test_cli_preserves_human_readable_output(capsys):
+    exit_code = main(["data/sample_prompts.jsonl", "--schema", "prompt"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "VALID:" in captured.out
+    assert "sample_prompts.jsonl" in captured.out
+    assert "Valid records: 3/3" in captured.out
+
+
+def test_cli_supports_machine_readable_output(capsys):
+    exit_code = main(["data/sample_evaluations.jsonl", "--schema", "evaluation", "--json"])
+
+    payload = json.loads(capsys.readouterr().out)
+    assert exit_code == 0
+    assert payload["is_valid"] is True
+    assert payload["valid_records"] == 3
+
+
+def test_cli_returns_nonzero_and_lists_issues(tmp_path, capsys):
+    path = tmp_path / "invalid.jsonl"
+    path.write_text("\n", encoding="utf-8")
+
+    exit_code = main([str(path)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "INVALID:" in captured.out
+    assert "blank_line" in captured.out

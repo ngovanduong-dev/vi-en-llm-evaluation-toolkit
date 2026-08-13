@@ -6,7 +6,6 @@ import ast
 import json
 from dataclasses import dataclass
 
-
 CODING_REVIEW_CHECKLIST = [
     "Syntax error",
     "Logic error",

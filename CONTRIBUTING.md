@@ -18,18 +18,23 @@ pull request. Do not mix unrelated cleanup with feature work.
 
 ## Current development setup
 
-The repository currently uses `requirements.txt` and imports modules as
-`src.*`. Packaging migration and additional quality tools are planned work and
-must not be described as implemented.
-
 ```bash
 python -m venv .venv
-pip install -r requirements.txt
-python -m pytest -q
-python -m src.jsonl_validator data/sample_prompts.jsonl --schema prompt
-python -m src.jsonl_validator data/sample_responses.jsonl --schema response
-python -m src.jsonl_validator data/sample_evaluations.jsonl --schema evaluation
+python -m pip install -e ".[dev]"
+python -m pytest
+ruff check .
+ruff format --check .
+mypy --strict src
+bandit -c pyproject.toml -r src scripts
+pip-audit --skip-editable
+python -m build
+vi-en-eval data/sample_prompts.jsonl --schema prompt
+vi-en-eval data/sample_responses.jsonl --schema response
+vi-en-eval data/sample_evaluations.jsonl --schema evaluation
 ```
+
+The audit skips only the editable, unpublished project itself; all installed
+third-party runtime and development dependencies remain in scope.
 
 On Windows, activate the environment with `.venv\Scripts\activate`. On POSIX
 shells, use `source .venv/bin/activate`.

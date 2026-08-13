@@ -36,7 +36,7 @@ For technical reviewers:
 
 ```text
 README
--> src/
+-> src/vi_en_eval/
 -> tests/
 -> data/*.jsonl
 -> rubrics/
@@ -95,7 +95,7 @@ data/                 Synthetic JSONL records.
 portfolio_samples/    Human-readable synthetic portfolio samples.
 reports/              Sample exported evaluator report.
 rubrics/              Public-safe evaluation rubrics.
-src/                  Toolkit implementation modules.
+src/vi_en_eval/       Installable toolkit package.
 tests/                Pytest coverage for core behavior.
 ```
 
@@ -115,8 +115,9 @@ python -B scripts/generate_baseline_inventory.py check
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
-python -m pytest -q
+python -m pip install -e ".[dev]"
+python -m pytest
+vi-en-eval --help
 ```
 
 ## JSONL Validation
@@ -124,15 +125,18 @@ python -m pytest -q
 Validate sample prompt, response, and evaluation datasets:
 
 ```bash
-python -m src.jsonl_validator data/sample_prompts.jsonl --schema prompt
-python -m src.jsonl_validator data/sample_responses.jsonl --schema response
-python -m src.jsonl_validator data/sample_evaluations.jsonl --schema evaluation
+vi-en-eval data/sample_prompts.jsonl --schema prompt
+vi-en-eval data/sample_responses.jsonl --schema response
+vi-en-eval data/sample_evaluations.jsonl --schema evaluation
 ```
+
+The module form remains available as
+`python -m vi_en_eval.jsonl_validator <path> --schema <schema>`.
 
 Optional machine-readable output:
 
 ```bash
-python -m src.jsonl_validator data/sample_evaluations.jsonl --schema evaluation --json
+vi-en-eval data/sample_evaluations.jsonl --schema evaluation --json
 ```
 
 ## Synthetic Dataset Format
@@ -151,7 +155,8 @@ Each evaluation record contains:
 
 ## Rubric Scoring
 
-Scoring helpers live in [`src/scoring.py`](src/scoring.py). They support:
+Scoring helpers live in
+[`src/vi_en_eval/scoring.py`](src/vi_en_eval/scoring.py). They support:
 
 - Winner label normalization.
 - Average rubric score calculation.
@@ -160,14 +165,16 @@ Scoring helpers live in [`src/scoring.py`](src/scoring.py). They support:
 
 ## Report Export
 
-Report helpers live in [`src/report_exporter.py`](src/report_exporter.py).
+Report helpers live in
+[`src/vi_en_eval/report_exporter.py`](src/vi_en_eval/report_exporter.py).
 
 The sample Markdown report is available at
 [`reports/sample_evaluation_report.md`](reports/sample_evaluation_report.md).
 
 ## Coding Response Checks
 
-Coding checks live in [`src/code_checks.py`](src/code_checks.py). They support:
+Coding checks live in
+[`src/vi_en_eval/code_checks.py`](src/vi_en_eval/code_checks.py). They support:
 
 - Python syntax parsing with line and column diagnostics.
 - JSON text validation.

@@ -1,4 +1,4 @@
-from src.code_checks import (
+from vi_en_eval.code_checks import (
     CODING_REVIEW_CHECKLIST,
     check_python_syntax,
     validate_json_text,

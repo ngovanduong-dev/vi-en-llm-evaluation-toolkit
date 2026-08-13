@@ -1,7 +1,11 @@
 import csv
 
-from src.report_exporter import evaluation_to_markdown, export_evaluations_csv, export_markdown_report
-from src.schemas import EvaluationRecord
+from vi_en_eval.report_exporter import (
+    evaluation_to_markdown,
+    export_evaluations_csv,
+    export_markdown_report,
+)
+from vi_en_eval.schemas import EvaluationRecord
 
 
 def sample_record() -> EvaluationRecord:

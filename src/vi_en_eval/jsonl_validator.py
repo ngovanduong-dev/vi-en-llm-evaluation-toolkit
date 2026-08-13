@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 from pydantic import ValidationError
 
-from src.schemas import SCHEMA_REGISTRY
+from vi_en_eval.schemas import SCHEMA_REGISTRY
 
 
 @dataclass(frozen=True)
@@ -35,9 +36,13 @@ class JsonlValidationResult:
 
     @property
     def is_valid(self) -> bool:
+        """Return whether validation completed without any issues."""
+
         return not self.issues
 
     def to_dict(self) -> dict[str, Any]:
+        """Serialize the result for machine-readable CLI output."""
+
         return {
             "file_path": self.file_path,
             "schema_name": self.schema_name,
@@ -52,7 +57,7 @@ def _field_path(error_location: tuple[Any, ...]) -> str:
     return ".".join(str(part) for part in error_location)
 
 
-def _schema_issue(line_number: int, error: dict[str, Any]) -> ValidationIssue:
+def _schema_issue(line_number: int, error: Mapping[str, Any]) -> ValidationIssue:
     field = _field_path(error.get("loc", ()))
     return ValidationIssue(
         line_number=line_number,
@@ -152,7 +157,9 @@ def format_validation_result(result: JsonlValidationResult) -> str:
     return "\n".join(lines)
 
 
-def main(argv: list[str] | None = None) -> int:
+def create_argument_parser() -> argparse.ArgumentParser:
+    """Create the command-line parser shared by module and console entry points."""
+
     parser = argparse.ArgumentParser(description="Validate synthetic LLM evaluation JSONL files.")
     parser.add_argument("path", help="Path to the JSONL file to validate.")
     parser.add_argument(
@@ -162,8 +169,13 @@ def main(argv: list[str] | None = None) -> int:
         help="Schema to validate against.",
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
-    args = parser.parse_args(argv)
+    return parser
 
+
+def main(argv: list[str] | None = None) -> int:
+    """Run JSONL validation and return a process-compatible exit code."""
+
+    args = create_argument_parser().parse_args(argv)
     result = validate_jsonl(args.path, schema_name=args.schema)
     if args.json:
         print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Final, Literal, TypeAlias
 
-from src.schemas import EvaluationRecord, RubricScores
+from vi_en_eval.schemas import EvaluationRecord, RubricScores
 
-Winner = Literal["A", "B", "Tie"]
+Winner: TypeAlias = Literal["A", "B", "Tie"]
+EvaluationSummary: TypeAlias = dict[str, str | float | int]
 
-SCORE_FIELDS = [
+SCORE_FIELDS: Final[tuple[str, ...]] = (
     "instruction_following",
     "correctness",
     "completeness",
@@ -16,10 +17,12 @@ SCORE_FIELDS = [
     "language_naturalness",
     "formatting",
     "safety",
-]
+)
 
 
 def normalize_winner(value: str) -> Winner:
+    """Normalize a supported human-readable winner label."""
+
     normalized = value.strip().lower()
 
     if normalized in {"a", "response a", "model a"}:
@@ -33,11 +36,14 @@ def normalize_winner(value: str) -> Winner:
 
 
 def calculate_average_score(scores: RubricScores) -> float:
-    values = [getattr(scores, field) for field in SCORE_FIELDS]
-    return round(sum(values) / len(values), 2)
+    """Calculate the mean score across all rubric dimensions."""
+
+    return scores.average()
 
 
 def score_band(score: float) -> str:
+    """Map an average score to its existing qualitative band."""
+
     if score >= 4.5:
         return "strong"
     if score >= 3.5:
@@ -47,7 +53,9 @@ def score_band(score: float) -> str:
     return "poor"
 
 
-def summarize_evaluation(record: EvaluationRecord) -> dict:
+def summarize_evaluation(record: EvaluationRecord) -> EvaluationSummary:
+    """Create the compact evaluation summary used by report exports."""
+
     average_score = calculate_average_score(record.rubric_scores)
 
     return {

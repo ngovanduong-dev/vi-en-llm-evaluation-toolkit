@@ -3,16 +3,16 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
-from pydantic import BaseModel
 import pytest
+from pydantic import BaseModel
 
 from scripts import generate_baseline_inventory as baseline
-from src.jsonl_validator import validate_jsonl
+from vi_en_eval.jsonl_validator import validate_jsonl
 
 
 class ExampleRecord(BaseModel):
@@ -192,7 +192,7 @@ def test_collection_error_and_zero_items_fail(tmp_path):
         baseline.collect_pytest_inventory(tmp_path)
 
     (tmp_path / "tests" / "test_broken.py").unlink()
-    with pytest.raises(baseline.InventoryError, match="zero test cases|exit code 5"):
+    with pytest.raises(baseline.InventoryError, match=r"zero test cases|exit code 5"):
         baseline.collect_pytest_inventory(tmp_path)
 
 
@@ -231,7 +231,7 @@ def test_canonical_json_bytes_are_stable_utf8_lf():
 
 
 def test_input_hash_uses_canonical_text_and_sorted_manifest(tmp_path):
-    first = _write(tmp_path / "first.txt", "first\n")
+    _write(tmp_path / "first.txt", "first\n")
     second = _write(tmp_path / "second.txt", "second\n")
 
     forward = baseline.build_input_hash(tmp_path, ("second.txt", "first.txt"))
@@ -269,7 +269,7 @@ def test_aggregate_hash_is_equal_for_lf_and_crlf_fixtures(tmp_path):
     _write(lf_root / "two.txt", "ba\n")
     (crlf_root / "one.txt").parent.mkdir(parents=True)
     (crlf_root / "one.txt").write_bytes(b"one\r\ntwo\r\n")
-    (crlf_root / "two.txt").write_bytes("ba\r\n".encode("utf-8"))
+    (crlf_root / "two.txt").write_bytes(b"ba\r\n")
 
     lf_manifest = baseline.build_input_hash(lf_root, ("one.txt", "two.txt"))
     crlf_manifest = baseline.build_input_hash(crlf_root, ("one.txt", "two.txt"))
@@ -351,25 +351,27 @@ def test_repository_inventory_relationships_and_input_scope():
     payload = baseline.build_inventory()
 
     assert payload["status"] == "valid"
-    assert payload["runtime_schemas"]["count"] == len(
-        payload["runtime_schemas"]["registered"]
-    )
+    assert payload["runtime_schemas"]["count"] == len(payload["runtime_schemas"]["registered"])
     assert payload["jsonl"]["file_count"] == len(payload["jsonl"]["files"])
-    assert payload["portfolio_samples"]["count"] == len(
-        payload["portfolio_samples"]["paths"]
-    )
-    assert payload["rubrics"]["standalone_document_count"] == len(
-        payload["rubrics"]["paths"]
-    )
-    assert payload["tests"]["collected_test_case_count"] == len(
-        payload["tests"]["nodeids"]
-    )
+    assert payload["portfolio_samples"]["count"] == len(payload["portfolio_samples"]["paths"])
+    assert payload["rubrics"]["standalone_document_count"] == len(payload["rubrics"]["paths"])
+    assert payload["tests"]["collected_test_case_count"] == len(payload["tests"]["nodeids"])
 
-    input_paths = {
-        entry["path"] for entry in payload["provenance"]["input_hash"]["files"]
-    }
+    input_paths = {entry["path"] for entry in payload["provenance"]["input_hash"]["files"]}
     assert baseline.ARTIFACT_PATH not in input_paths
     assert "AGENTS.md" not in input_paths
+    assert "pyproject.toml" in input_paths
+    assert all(
+        not path.startswith("src/") or path.startswith("src/vi_en_eval/") for path in input_paths
+    )
+    assert {
+        "src/vi_en_eval/__init__.py",
+        "src/vi_en_eval/code_checks.py",
+        "src/vi_en_eval/jsonl_validator.py",
+        "src/vi_en_eval/report_exporter.py",
+        "src/vi_en_eval/schemas.py",
+        "src/vi_en_eval/scoring.py",
+    }.issubset(input_paths)
     assert all(not path.startswith("data/private/") for path in input_paths)
     assert all(not Path(path).is_absolute() for path in input_paths)
 

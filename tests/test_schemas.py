@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.schemas import DetectedIssue, EvaluationRecord, PromptRecord, ResponsePairRecord
+from vi_en_eval.schemas import DetectedIssue, EvaluationRecord, PromptRecord, ResponsePairRecord
 
 
 def valid_evaluation_record() -> dict:

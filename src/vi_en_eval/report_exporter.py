@@ -5,15 +5,15 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from src.schemas import EvaluationRecord
-from src.scoring import calculate_average_score, summarize_evaluation
+from vi_en_eval.schemas import EvaluationRecord
+from vi_en_eval.scoring import calculate_average_score, summarize_evaluation
 
 
 def _detected_issue_lines(record: EvaluationRecord) -> list[str]:
     if not record.detected_issues:
         return ["- No major issues detected."]
 
-    lines = []
+    lines: list[str] = []
     for issue in record.detected_issues:
         lines.append(f"- **{issue.category}** ({issue.severity.value}): {issue.description}")
         if issue.suggested_fix:
@@ -23,6 +23,8 @@ def _detected_issue_lines(record: EvaluationRecord) -> list[str]:
 
 
 def evaluation_to_markdown(record: EvaluationRecord) -> str:
+    """Render one evaluation record as Markdown."""
+
     lines = [
         f"# Evaluation Report: {record.id}",
         "",
@@ -49,6 +51,8 @@ def evaluation_to_markdown(record: EvaluationRecord) -> str:
 
 
 def export_markdown_report(record: EvaluationRecord, path: str | Path) -> Path:
+    """Write one evaluation report to a UTF-8 Markdown file."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(evaluation_to_markdown(record), encoding="utf-8")
@@ -56,6 +60,8 @@ def export_markdown_report(record: EvaluationRecord, path: str | Path) -> Path:
 
 
 def export_evaluations_csv(records: list[EvaluationRecord], path: str | Path) -> Path:
+    """Write compact evaluation summaries to a UTF-8 CSV file."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
