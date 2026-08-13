@@ -120,7 +120,7 @@ For technical reviewers:
 
 ```text
 README
--> src/
+-> src/vi_en_eval/
 -> tests/
 -> data/*.jsonl
 -> reports/sample_evaluation_report.md

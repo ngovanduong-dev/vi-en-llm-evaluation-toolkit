@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 *.pyo
 .pytest_cache/
+.coverage
+coverage.xml
 .mypy_cache/
 .ruff_cache/
 .venv/
@@ -10,6 +12,9 @@ env/
 .env
 .env.*
 .DS_Store
+build/
+dist/
+*.egg-info/
 
 reports/*.csv
 reports/generated_*.md

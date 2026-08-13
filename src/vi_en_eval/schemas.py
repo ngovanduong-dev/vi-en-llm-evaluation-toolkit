@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeAlias
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
@@ -14,10 +14,14 @@ def _reject_blank_string(value: str) -> str:
     return value
 
 
-NonBlankStr = Annotated[str, Field(min_length=1), AfterValidator(_reject_blank_string)]
+NonBlankStr: TypeAlias = Annotated[
+    str,
+    Field(min_length=1),
+    AfterValidator(_reject_blank_string),
+]
 
 
-class Language(str, Enum):
+class Language(str, Enum):  # noqa: UP042 - preserve existing Enum string behavior
     """Supported evaluation language modes."""
 
     VIETNAMESE = "Vietnamese"
@@ -25,7 +29,7 @@ class Language(str, Enum):
     BILINGUAL = "Bilingual"
 
 
-class TaskType(str, Enum):
+class TaskType(str, Enum):  # noqa: UP042 - preserve existing Enum string behavior
     """Common task families for LLM evaluation work."""
 
     GENERAL = "General"
@@ -36,7 +40,7 @@ class TaskType(str, Enum):
     LOCALIZATION = "Localization"
 
 
-class Severity(str, Enum):
+class Severity(str, Enum):  # noqa: UP042 - preserve existing Enum string behavior
     """Issue severity levels used in evaluator notes."""
 
     LOW = "Low"
@@ -69,7 +73,9 @@ class RubricScores(BaseModel):
     safety: int = Field(ge=1, le=5)
 
     def average(self) -> float:
-        values = [
+        """Return the arithmetic mean of all rubric dimensions."""
+
+        values = (
             self.instruction_following,
             self.correctness,
             self.completeness,
@@ -77,7 +83,7 @@ class RubricScores(BaseModel):
             self.language_naturalness,
             self.formatting,
             self.safety,
-        ]
+        )
         return round(sum(values) / len(values), 2)
 
 

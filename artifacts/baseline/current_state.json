@@ -124,12 +124,8 @@
           "sha256": "027a9f2e0fe5fcd2151b2406d4adb98418713469708311dbffe764fb56b7f1db"
         },
         {
-          "path": "pytest.ini",
-          "sha256": "6c6ccf864e8f2d2e0223ee8e39bfde660c12435aa37d81e2b14000a6bee15003"
-        },
-        {
-          "path": "requirements.txt",
-          "sha256": "dc693b95ee4654b08f97ef366efeccfdeedf495a994291c4f78a2961abc46684"
+          "path": "pyproject.toml",
+          "sha256": "0269e2840af352fe797444f183b4aa8894446873718da21d8d960291247b56f9"
         },
         {
           "path": "rubrics/coding_response_rubric.md",
@@ -149,19 +145,31 @@
         },
         {
           "path": "scripts/generate_baseline_inventory.py",
-          "sha256": "759e141f58546ef1ca425fe0f5f1e151385556b960d07345a5dcf4fed8e17752"
+          "sha256": "7c7b5a043578a0dbe307baab645989750d6cc8c31ec2389f63d6756a12f545ae"
         },
         {
-          "path": "src/__init__.py",
-          "sha256": "b07665781fdc59b0e6baa84089f34b9b072b1b7145c4b7798132159a2f5eda54"
+          "path": "src/vi_en_eval/__init__.py",
+          "sha256": "3735390bd17c147e1ab27d6b71bb219f5df8926a737829a4887a181ba854689d"
         },
         {
-          "path": "src/jsonl_validator.py",
-          "sha256": "b17e50bb5ef7703cf38de33962bd3e965742edb41583c92d4050c011445d67fe"
+          "path": "src/vi_en_eval/code_checks.py",
+          "sha256": "11b8c3edb821fc448a75c0e138d370a5e00c186698bfd7e9427aebf45f7084a3"
         },
         {
-          "path": "src/schemas.py",
-          "sha256": "ff8eaefaa840e79597bb4ff7341f3517803b25527a2577386a10d4c837599df3"
+          "path": "src/vi_en_eval/jsonl_validator.py",
+          "sha256": "ab94efe318d6e449eb443f75c3dcbf9ed38f4ea14196b54ea5068f37a7acea83"
+        },
+        {
+          "path": "src/vi_en_eval/report_exporter.py",
+          "sha256": "17843d22a15a1d7a681d292d3018eb704e9a3c6880abffab22073b9b23b7eb9e"
+        },
+        {
+          "path": "src/vi_en_eval/schemas.py",
+          "sha256": "ab578b931229ffba6a5623b7f3e4b0cba7f9050bec81ddf513b90705287e04d6"
+        },
+        {
+          "path": "src/vi_en_eval/scoring.py",
+          "sha256": "8f40de0720f8b3c3037af0d5a4f4d64150ccce501dc0b15fa561376ad4cc73ed"
         },
         {
           "path": "tests/__init__.py",
@@ -169,31 +177,31 @@
         },
         {
           "path": "tests/test_baseline_inventory.py",
-          "sha256": "7291f2ed5a0c282f370c8150a0c4b11c2fe7ea87e342ccab7a3a6a61fac5c6c9"
+          "sha256": "2b16b9bf4b95e81c946df5a302e886e1e13d7306812aa2eceac610dd2740c6b6"
         },
         {
           "path": "tests/test_code_checks.py",
-          "sha256": "5b5b5003aae248874d5e1fc9ddf58e8204e0f49c9b687a0668c5dd675b74630e"
+          "sha256": "f8e83d3a783c08a1cf6147fa36f9305eb4439fd4cb36da8d285b83884a3a51a3"
         },
         {
           "path": "tests/test_jsonl_validator.py",
-          "sha256": "5a94384e70dc79cbb0a56b2151517c07b3064bb60467eecaab3c191c952fbfb8"
+          "sha256": "430a04f37eb9426275f37dd364b510404139b653b4270eeba484ed2a9714b852"
         },
         {
           "path": "tests/test_report_exporter.py",
-          "sha256": "9147b54c48afe625040814e32d8de07a386dbffe75d8424edf9c035a366ad9cb"
+          "sha256": "02acdeb2040e1fa542d0b05539d9dbb5a76a786596913c5fb2e8e6d4e472f284"
         },
         {
           "path": "tests/test_schemas.py",
-          "sha256": "e546948186a802fdd6e36e4fbcf5dc951cca3701d93e1f05065e74d81893b2f7"
+          "sha256": "e536b3b017ea02a50b766d13288f79976ceb9285ec2c9eadf9e1e6404b8a708d"
         },
         {
           "path": "tests/test_scoring.py",
-          "sha256": "f3aac2b8feffc7b57e25cb5d1753ac0b791e9858c8c8d6de566b472f9f7ec773"
+          "sha256": "8db6029df1ffae12b1ea70fb584ea733bde6ecd5364448543d70f5188ac4c785"
         }
       ],
       "normalization": "utf-8-lf",
-      "value": "6bda58b6e20d5ebda1e76dbfc37ef23b29f43c69cd8d7764b2803212de06420a"
+      "value": "a5a80da881185cd11cbe1c1dc6444f96d8cd1eb1fdae65735ed3bd6740cabccd"
     }
   },
   "rubrics": {
@@ -214,23 +222,23 @@
     ],
     "registered": [
       {
-        "model": "src.schemas:EvaluationRecord",
+        "model": "vi_en_eval.schemas:EvaluationRecord",
         "name": "evaluation"
       },
       {
-        "model": "src.schemas:PromptRecord",
+        "model": "vi_en_eval.schemas:PromptRecord",
         "name": "prompt"
       },
       {
-        "model": "src.schemas:ResponsePairRecord",
+        "model": "vi_en_eval.schemas:ResponsePairRecord",
         "name": "response"
       }
     ],
-    "registry": "src.schemas:SCHEMA_REGISTRY"
+    "registry": "vi_en_eval.schemas:SCHEMA_REGISTRY"
   },
   "status": "valid",
   "tests": {
-    "collected_test_case_count": 70,
+    "collected_test_case_count": 74,
     "collection": {
       "cache_provider": false,
       "external_plugin_autoload": false,
@@ -248,7 +256,7 @@
         "path": "tests/test_code_checks.py"
       },
       {
-        "collected_test_case_count": 11,
+        "collected_test_case_count": 15,
         "path": "tests/test_jsonl_validator.py"
       },
       {
@@ -298,6 +306,9 @@
       "tests/test_code_checks.py::test_validate_json_text_valid",
       "tests/test_code_checks.py::test_validate_jsonl_text_rejects_blank_lines",
       "tests/test_code_checks.py::test_validate_jsonl_text_reports_each_line",
+      "tests/test_jsonl_validator.py::test_cli_preserves_human_readable_output",
+      "tests/test_jsonl_validator.py::test_cli_returns_nonzero_and_lists_issues",
+      "tests/test_jsonl_validator.py::test_cli_supports_machine_readable_output",
       "tests/test_jsonl_validator.py::test_sample_jsonl_files_match_registered_schemas[evaluation]",
       "tests/test_jsonl_validator.py::test_sample_jsonl_files_match_registered_schemas[prompt]",
       "tests/test_jsonl_validator.py::test_sample_jsonl_files_match_registered_schemas[response]",
@@ -308,6 +319,7 @@
       "tests/test_jsonl_validator.py::test_validator_rejects_malformed_json",
       "tests/test_jsonl_validator.py::test_validator_rejects_missing_required_field",
       "tests/test_jsonl_validator.py::test_validator_rejects_score_outside_one_to_five",
+      "tests/test_jsonl_validator.py::test_validator_rejects_unknown_schema",
       "tests/test_jsonl_validator.py::test_validator_rejects_whitespace_only_record_id",
       "tests/test_report_exporter.py::test_evaluation_to_markdown_contains_core_sections",
       "tests/test_report_exporter.py::test_evaluation_to_markdown_handles_records_without_detected_issues",

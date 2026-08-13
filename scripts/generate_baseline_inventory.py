@@ -3,21 +3,24 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
-from contextlib import contextmanager
 import hashlib
 import importlib
 import json
 import os
-from pathlib import Path, PurePosixPath
 import sys
 import tempfile
-from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence
-
+from collections import Counter
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
+from pathlib import Path, PurePosixPath
+from typing import Any
 
 ARTIFACT_SCHEMA_VERSION = 1
 ARTIFACT_PATH = "artifacts/baseline/current_state.json"
 GENERATOR_PATH = "scripts/generate_baseline_inventory.py"
+PACKAGE_DIRECTORY = "src/vi_en_eval"
+SCHEMA_MODULE = "vi_en_eval.schemas"
+VALIDATOR_MODULE = "vi_en_eval.jsonl_validator"
 PLUGIN_AUTOLOAD_ENV = "PYTEST_DISABLE_PLUGIN_AUTOLOAD"
 INPUT_HASH_NORMALIZATION = "utf-8-lf"
 
@@ -29,11 +32,7 @@ JSONL_SCHEMA_BINDINGS: tuple[tuple[str, str], ...] = (
 
 STATIC_HASH_INPUTS: tuple[str, ...] = (
     GENERATOR_PATH,
-    "src/__init__.py",
-    "src/schemas.py",
-    "src/jsonl_validator.py",
-    "pytest.ini",
-    "requirements.txt",
+    "pyproject.toml",
 )
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -165,7 +164,7 @@ def describe_runtime_schemas(registry: object) -> list[dict[str, str]]:
         raise InventoryError(f"Unable to import Pydantic: {type(exc).__name__}: {exc}") from exc
 
     if not isinstance(registry, Mapping):
-        raise InventoryError("src.schemas.SCHEMA_REGISTRY must be a mapping")
+        raise InventoryError(f"{SCHEMA_MODULE}.SCHEMA_REGISTRY must be a mapping")
 
     registered: list[dict[str, str]] = []
     for name, model in registry.items():
@@ -186,25 +185,26 @@ def describe_runtime_schemas(registry: object) -> list[dict[str, str]]:
 
 
 def _import_runtime_components(root: Path) -> tuple[object, Callable[..., Any]]:
-    root_text = str(root.resolve(strict=True))
-    inserted = root_text not in sys.path
+    source_directory = _require_directory(root, "src")
+    source_text = str(source_directory.resolve(strict=True))
+    inserted = source_text not in sys.path
     if inserted:
-        sys.path.insert(0, root_text)
+        sys.path.insert(0, source_text)
     try:
         importlib.invalidate_caches()
-        schemas_module = importlib.import_module("src.schemas")
-        validator_module = importlib.import_module("src.jsonl_validator")
+        schemas_module = importlib.import_module(SCHEMA_MODULE)
+        validator_module = importlib.import_module(VALIDATOR_MODULE)
     except Exception as exc:
         raise InventoryError(
             f"Unable to import runtime schema registry or validator: {type(exc).__name__}: {exc}"
         ) from exc
     finally:
         if inserted:
-            sys.path.remove(root_text)
+            sys.path.remove(source_text)
 
     for module, expected_path in (
-        (schemas_module, "src/schemas.py"),
-        (validator_module, "src/jsonl_validator.py"),
+        (schemas_module, f"{PACKAGE_DIRECTORY}/schemas.py"),
+        (validator_module, f"{PACKAGE_DIRECTORY}/jsonl_validator.py"),
     ):
         module_file = getattr(module, "__file__", None)
         if module_file is None:
@@ -218,7 +218,7 @@ def _import_runtime_components(root: Path) -> tuple[object, Callable[..., Any]]:
     registry = getattr(schemas_module, "SCHEMA_REGISTRY", None)
     validator = getattr(validator_module, "validate_jsonl", None)
     if not callable(validator):
-        raise InventoryError("src.jsonl_validator.validate_jsonl is not callable")
+        raise InventoryError(f"{VALIDATOR_MODULE}.validate_jsonl is not callable")
     return registry, validator
 
 
@@ -255,9 +255,7 @@ def validate_jsonl_bindings(
             details.append(f"unmapped discovered files: {', '.join(unmapped)}")
         raise InventoryError("JSONL binding mismatch (" + "; ".join(details) + ")")
 
-    return sorted(
-        (discovered_by_folded[key], binding_by_path[key][1]) for key in discovered_keys
-    )
+    return sorted((discovered_by_folded[key], binding_by_path[key][1]) for key in discovered_keys)
 
 
 def _jsonl_line_counts(path: Path) -> tuple[int, int]:
@@ -270,7 +268,9 @@ def _jsonl_line_counts(path: Path) -> tuple[int, int]:
                 if line.strip():
                     record_count += 1
     except (OSError, UnicodeError) as exc:
-        raise InventoryError(f"Unable to read JSONL input {path}: {type(exc).__name__}: {exc}") from exc
+        raise InventoryError(
+            f"Unable to read JSONL input {path}: {type(exc).__name__}: {exc}"
+        ) from exc
     return line_count, record_count
 
 
@@ -387,6 +387,8 @@ def collect_pytest_inventory(root: Path) -> dict[str, Any]:
             exit_code = pytest.main(
                 [
                     "--collect-only",
+                    "-o",
+                    "addopts=",
                     "-p",
                     "no:cacheprovider",
                     "-p",
@@ -398,9 +400,7 @@ def collect_pytest_inventory(root: Path) -> dict[str, Any]:
                 plugins=[plugin],
             )
         except Exception as exc:
-            raise InventoryError(
-                f"Pytest collection failed: {type(exc).__name__}: {exc}"
-            ) from exc
+            raise InventoryError(f"Pytest collection failed: {type(exc).__name__}: {exc}") from exc
 
     if exit_code != pytest.ExitCode.OK:
         details = "; ".join(sorted(plugin.errors)) or f"pytest exit code {int(exit_code)}"
@@ -535,7 +535,9 @@ def _validate_inventory_relationships(payload: Mapping[str, Any]) -> None:
     )
     for actual, expected, label in checks:
         if actual != expected:
-            raise InventoryError(f"Inventory relationship failed for {label}: {actual} != {expected}")
+            raise InventoryError(
+                f"Inventory relationship failed for {label}: {actual} != {expected}"
+            )
 
 
 def build_inventory(
@@ -581,9 +583,11 @@ def build_inventory(
         )
         tests = collect_pytest_inventory(root)
         test_python_paths = discover_files(root, "tests", ".py")
+        package_python_paths = discover_files(root, PACKAGE_DIRECTORY, ".py")
 
         input_paths = [
             *STATIC_HASH_INPUTS,
+            *package_python_paths,
             *discovered_jsonl,
             *portfolio_paths,
             *rubric_paths,
@@ -598,9 +602,7 @@ def build_inventory(
             "files": jsonl_files,
             "total_line_count": sum(entry["line_count"] for entry in jsonl_files),
             "total_record_count": sum(entry["record_count"] for entry in jsonl_files),
-            "total_valid_record_count": sum(
-                entry["valid_record_count"] for entry in jsonl_files
-            ),
+            "total_valid_record_count": sum(entry["valid_record_count"] for entry in jsonl_files),
         },
         "portfolio_samples": {
             "count": len(portfolio_paths),
@@ -618,7 +620,7 @@ def build_inventory(
             "count": len(registered),
             "names": schema_names,
             "registered": registered,
-            "registry": "src.schemas:SCHEMA_REGISTRY",
+            "registry": f"{SCHEMA_MODULE}:SCHEMA_REGISTRY",
         },
         "status": "valid",
         "tests": tests,
@@ -691,7 +693,10 @@ def main(argv: Sequence[str] | None = None, *, root: Path = REPOSITORY_ROOT) -> 
             return 1
         current = artifact_path.read_bytes()
         if current != candidate:
-            print(f"Baseline artifact does not match generated output: {ARTIFACT_PATH}", file=sys.stderr)
+            print(
+                f"Baseline artifact does not match generated output: {ARTIFACT_PATH}",
+                file=sys.stderr,
+            )
             if args.stdout:
                 _emit_stdout(candidate)
             return 1
