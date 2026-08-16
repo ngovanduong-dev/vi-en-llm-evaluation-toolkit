@@ -1,128 +1,59 @@
-# Vietnamese-English LLM Evaluation Toolkit & Synthetic Portfolio
+# Vietnamese-English LLM Evaluation Toolkit
 
 [![tests](https://github.com/ngovanduong-dev/vi-en-llm-evaluation-toolkit/actions/workflows/tests.yml/badge.svg)](https://github.com/ngovanduong-dev/vi-en-llm-evaluation-toolkit/actions/workflows/tests.yml)
 
-This project demonstrates a synthetic AI training workflow: creating evaluation
-records, validating JSONL datasets, scoring prompt-response pairs with rubrics,
-reviewing Vietnamese-English language quality, checking coding-response issues,
-and exporting reproducible evaluator reports.
+A small Python toolkit for working with Vietnamese-English LLM evaluation data.
+It provides typed records for prompts, response pairs, rubric scores, and
+evaluator judgments; validates JSONL datasets; calculates simple rubric
+summaries; exports reports; and performs lightweight checks on coding responses.
 
-All examples are synthetic and portfolio-safe. This repository does not contain
-private platform tasks, internal guidelines, client data, paid task content,
-real model outputs, screenshots, or work-queue materials.
+The installed `vi-en-eval` command currently exposes JSONL validation. Scoring,
+report export, and coding-response checks are available as Python APIs.
 
-## Who This Is For
+## What the Tool Does
 
-For AI recruiters and platform reviewers, this repo provides readable synthetic
-samples that show evaluator judgment, rationale writing, rubric design,
-hallucination detection, localization QA, and technical response review.
+- Models prompt, response-pair, and evaluation records with strict Pydantic
+  schemas.
+- Validates JSONL syntax, required fields, enum values, score ranges, non-blank
+  text, extra fields, and duplicate record IDs.
+- Calculates an average across seven rubric dimensions and assigns a simple
+  qualitative score band.
+- Normalizes common pairwise winner labels and builds compact evaluation
+  summaries.
+- Renders individual evaluations as Markdown and exports summary rows as CSV.
+- Checks Python syntax and validates JSON or JSONL text without executing
+  generated code.
 
-For technical reviewers, it provides a small Python toolkit with Pydantic
-schemas, JSONL validation, scoring helpers, report export, coding-response
-checks, sample data, and pytest coverage.
+The repository also includes reusable evaluation rubrics, sample datasets, and
+a sample Markdown report.
 
-## Reviewer Paths
+## Installation
 
-For AI evaluation reviewers:
+Python 3.11 or newer with `venv` support is required. From a checked-out copy
+of the repository, create a virtual environment and install the package in
+editable mode.
 
-```text
-README
--> portfolio_samples/README.md
--> selected synthetic sample
--> reports/sample_evaluation_report.md
-```
+Windows PowerShell:
 
-For technical reviewers:
-
-```text
-README
--> src/vi_en_eval/
--> tests/
--> data/*.jsonl
--> rubrics/
--> reports/sample_evaluation_report.md
-```
-
-## Featured Portfolio Samples
-
-The portfolio index is available at
-[`portfolio_samples/README.md`](portfolio_samples/README.md).
-
-Vietnamese-English response evaluation:
-
-- [Response comparison](portfolio_samples/vi_en_response_evaluation/01_response_comparison.md)
-- [Instruction-following review](portfolio_samples/vi_en_response_evaluation/02_instruction_following_review.md)
-- [Hallucination detection review](portfolio_samples/vi_en_response_evaluation/03_hallucination_detection.md)
-- [Vietnamese localization QA review](portfolio_samples/vi_en_response_evaluation/04_localization_qa_review.md)
-
-Prompt and rubric writing:
-
-- [Vietnamese long complex prompt](portfolio_samples/prompt_rubric_writing/01_vietnamese_long_complex_prompt.md)
-- [Fine-grained rubric](portfolio_samples/prompt_rubric_writing/02_fine_grained_rubric.md)
-- [Explicit vs implicit criteria](portfolio_samples/prompt_rubric_writing/03_explicit_vs_implicit_criteria.md)
-- [Objective vs subjective criteria](portfolio_samples/prompt_rubric_writing/04_objective_vs_subjective_criteria.md)
-
-Technical response review:
-
-- [Python code review](portfolio_samples/technical_response_review/01_python_code_review.md)
-- [SQL query review](portfolio_samples/technical_response_review/02_sql_query_review.md)
-- [JSON output validation review](portfolio_samples/technical_response_review/03_json_output_validation.md)
-- [REST API explanation review](portfolio_samples/technical_response_review/04_api_response_review.md)
-
-## Toolkit Features
-
-- Pydantic schemas for prompts, response pairs, rubric scores, detected issues,
-  and evaluation records.
-- Synthetic JSONL datasets for prompts, response pairs, and completed
-  evaluations.
-- JSONL validator for malformed lines, blank lines, schema errors, duplicate
-  IDs, invalid winner labels, score ranges, and blank text fields.
-- Rubric scoring helpers for winner normalization, average score calculation,
-  score bands, and evaluation summaries.
-- Markdown and CSV report export helpers.
-- Coding-response checks for Python syntax, JSON text, and JSONL line validity.
-- Rubrics for general response evaluation, Vietnamese-English language QA,
-  coding response review, and prompt/rubric quality.
-- Pytest coverage for the core validation, scoring, export, schema, and coding
-  check behavior.
-- GitHub Actions workflow for tests and sample JSONL validation on pull
-  requests and pushes to `main`.
-
-## Project Structure
-
-```text
-data/                 Synthetic JSONL records.
-portfolio_samples/    Human-readable synthetic portfolio samples.
-reports/              Sample exported evaluator report.
-rubrics/              Public-safe evaluation rubrics.
-src/vi_en_eval/       Installable toolkit package.
-tests/                Pytest coverage for core behavior.
-```
-
-## Reproducible Baseline Inventory
-
-The repository's machine-readable current-state inventory is available at
-[`artifacts/baseline/current_state.json`](artifacts/baseline/current_state.json).
-Generate or verify it with:
-
-```bash
-python -B scripts/generate_baseline_inventory.py generate
-python -B scripts/generate_baseline_inventory.py check
-```
-
-## Quick Start
-
-```bash
+```powershell
 python -m venv .venv
-.venv\Scripts\activate
-python -m pip install -e ".[dev]"
-python -m pytest
-vi-en-eval --help
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e .
 ```
 
-## JSONL Validation
+POSIX shells:
 
-Validate sample prompt, response, and evaluation datasets:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+## CLI Examples
+
+Validate each bundled dataset against its registered schema:
 
 ```bash
 vi-en-eval data/sample_prompts.jsonl --schema prompt
@@ -130,85 +61,140 @@ vi-en-eval data/sample_responses.jsonl --schema response
 vi-en-eval data/sample_evaluations.jsonl --schema evaluation
 ```
 
-The module form remains available as
-`python -m vi_en_eval.jsonl_validator <path> --schema <schema>`.
-
-Optional machine-readable output:
+Return a machine-readable validation result:
 
 ```bash
 vi-en-eval data/sample_evaluations.jsonl --schema evaluation --json
 ```
 
-## Synthetic Dataset Format
+The validator can also be invoked as a Python module:
 
-Each evaluation record contains:
+```bash
+python -m vi_en_eval.jsonl_validator data/sample_evaluations.jsonl --schema evaluation
+```
 
-- `id`
-- `prompt_id`
-- `response_pair_id`
-- `language`
-- `task_type`
-- `winner`
-- `rubric_scores`
-- `detected_issues`
-- `rationale`
+The command exits with status `0` for a valid file and `1` when validation
+issues are found.
 
-## Rubric Scoring
+## Main Data Models
 
-Scoring helpers live in
-[`src/vi_en_eval/scoring.py`](src/vi_en_eval/scoring.py). They support:
+The models are defined in
+[`src/vi_en_eval/schemas.py`](src/vi_en_eval/schemas.py).
 
-- Winner label normalization.
-- Average rubric score calculation.
-- Score-band summaries.
-- Compact evaluation summary dictionaries for reporting.
+| Model | Purpose | Main fields |
+| --- | --- | --- |
+| `PromptRecord` | A prompt to evaluate | `id`, `language`, `task_type`, `prompt`, `expected_constraints` |
+| `ResponsePairRecord` | Two responses to the same prompt | `id`, `prompt_id`, `response_a`, `response_b`, optional model labels |
+| `EvaluationRecord` | A completed pairwise judgment | record references, language, task type, winner, rubric scores, issues, rationale |
+| `RubricScores` | Scores from 1 to 5 across seven criteria | instruction following, correctness, completeness, clarity, language naturalness, formatting, safety |
+| `DetectedIssue` | A problem noted during review | category, severity, description, optional suggested fix |
 
-## Report Export
+Languages are `Vietnamese`, `English`, or `Bilingual`. Task types cover general,
+translation, coding, safety, reasoning, and localization work. Pairwise winners
+are `A`, `B`, or `Tie`.
 
-Report helpers live in
-[`src/vi_en_eval/report_exporter.py`](src/vi_en_eval/report_exporter.py).
+All models reject unknown fields. IDs and required text fields must contain at
+least one non-whitespace character.
 
-The sample Markdown report is available at
+## Evaluation and Scoring Capabilities
+
+Scoring helpers in
+[`src/vi_en_eval/scoring.py`](src/vi_en_eval/scoring.py) currently provide:
+
+- normalization of common winner labels such as `response a`, `model b`, and
+  `draw`;
+- an arithmetic mean across the seven rubric dimensions;
+- compact summaries containing record references, winner, average score, score
+  band, issue count, and rationale.
+
+Average scores use these fixed bands:
+
+| Average | Band |
+| ---: | --- |
+| 4.5 or higher | `strong` |
+| 3.5 to less than 4.5 | `acceptable` |
+| 2.5 to less than 3.5 | `weak` |
+| Less than 2.5 | `poor` |
+
+Report helpers in
+[`src/vi_en_eval/report_exporter.py`](src/vi_en_eval/report_exporter.py) render
+one evaluation as Markdown or export multiple evaluation summaries as CSV. A
+sample output is available at
 [`reports/sample_evaluation_report.md`](reports/sample_evaluation_report.md).
 
-## Coding Response Checks
+Lightweight coding-response checks in
+[`src/vi_en_eval/code_checks.py`](src/vi_en_eval/code_checks.py) parse Python
+syntax and validate JSON or JSONL text. The Markdown files in [`rubrics/`](rubrics/)
+cover general responses, Vietnamese-English language QA, coding responses, and
+prompt/rubric quality.
 
-Coding checks live in
-[`src/vi_en_eval/code_checks.py`](src/vi_en_eval/code_checks.py). They support:
+## Project Structure
 
-- Python syntax parsing with line and column diagnostics.
-- JSON text validation.
-- JSONL text validation with per-line results.
-- A coding-review checklist for syntax errors, logic errors, missing edge
-  cases, runtime risks, API misuse, unsupported claims, inefficient solutions,
-  weak explanations, and invalid JSON output.
+```text
+src/vi_en_eval/       Package schemas, validation, scoring, export, and checks.
+data/                 Synthetic JSONL prompt, response, and evaluation records.
+rubrics/              Human-readable evaluation rubrics.
+reports/              Example report output.
+portfolio_samples/    Additional human-readable synthetic review examples.
+scripts/              Baseline inventory generator and checker.
+artifacts/baseline/   Machine-readable inventory of the current repository state.
+tests/                Pytest coverage for package and inventory behavior.
+.github/workflows/    Continuous integration configuration.
+```
 
-## What This Demonstrates
+## Data and Privacy
 
-- Vietnamese-English LLM response evaluation.
-- Rubric-based scoring and response ranking.
-- Concise evaluator rationale writing.
-- Hallucination and unsupported-claim detection.
-- Vietnamese localization and tone QA.
-- Prompt/rubric design with explicit, implicit, objective, and subjective
-  criteria.
-- Technical AI response review for Python, SQL, JSON, JSONL, and API
-  explanations.
-- JSONL validation and reproducible report generation.
-- Confidentiality-safe public portfolio presentation.
+The bundled datasets, rubrics, reports, and examples use synthetic or otherwise
+public-safe content. They do not contain private platform tasks, client data,
+internal guidelines, paid task content, real model outputs, screenshots,
+credentials, or work-queue material.
 
-## Current Status
+## Development and Testing
 
-The current repo is a toolkit plus synthetic portfolio. It includes code,
-tests, GitHub Actions, sample JSONL data, rubrics, portfolio samples, and a
-sample report.
+Install the development dependencies before running the full local checks:
 
-Future work may improve benchmark rigor, reproducibility, and evaluator
-workflows; planned work is not presented as a current capability.
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest
+ruff check .
+ruff format --check --config "format.line-ending = 'auto'" .
+mypy --strict src
+bandit -c pyproject.toml -r src scripts
+pip-audit --skip-editable
+python -m build
+python -B scripts/generate_baseline_inventory.py check
+```
 
-## Confidentiality Note
+The local formatting command accepts the checkout's native line endings. CI
+additionally enforces the repository's configured LF line endings.
 
-All examples in this repository are synthetic, generalized, and public-safe.
-They are designed to demonstrate AI evaluation skills without exposing private
-platform tasks, internal guidelines, client materials, paid task prompts, real
-model outputs, screenshots, work queues, or project codenames.
+The baseline artifact at
+[`artifacts/baseline/current_state.json`](artifacts/baseline/current_state.json)
+records the registered schemas, sample JSONL inventory, rubric and sample paths,
+and collected tests. Regenerate it only when its tracked inputs change:
+
+```bash
+python -B scripts/generate_baseline_inventory.py generate
+```
+
+CI runs tests on Python 3.11, 3.12, and 3.13, then performs separate lint,
+formatting, type-checking, security, sample-data validation, baseline, and build
+checks.
+
+## Limitations
+
+- The CLI validates JSONL only; it does not run model inference, score model
+  outputs, or export reports from the command line.
+- Validation is per file. It does not check relationships between prompt,
+  response-pair, and evaluation files.
+- An evaluation stores one rubric-score set and one pairwise winner rather than
+  separate criterion scores for both responses.
+- Scoring is an unweighted average with fixed bands. There are no calibrated
+  judges, agreement statistics, uncertainty estimates, or regression tests for
+  model quality.
+- Python checks parse syntax only. Generated code is never executed, tested, or
+  sandboxed by this toolkit.
+- The bundled records are small synthetic examples, not a representative
+  benchmark or evidence of production model performance.
+
+The project is licensed under the [MIT License](LICENSE).
