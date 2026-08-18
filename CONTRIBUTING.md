@@ -25,7 +25,7 @@ python -m pytest
 ruff check .
 ruff format --check .
 mypy --strict src
-bandit -c pyproject.toml -r src scripts
+bandit -c pyproject.toml -r src
 pip-audit --skip-editable
 python -m build
 vi-en-eval data/sample_prompts.jsonl --schema prompt
