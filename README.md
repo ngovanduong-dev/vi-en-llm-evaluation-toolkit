@@ -136,9 +136,7 @@ data/                 Synthetic JSONL prompt, response, and evaluation records.
 rubrics/              Human-readable evaluation rubrics.
 reports/              Example report output.
 portfolio_samples/    Additional human-readable synthetic review examples.
-scripts/              Baseline inventory generator and checker.
-artifacts/baseline/   Machine-readable inventory of the current repository state.
-tests/                Pytest coverage for package and inventory behavior.
+tests/                Pytest coverage for package behavior.
 .github/workflows/    Continuous integration configuration.
 ```
 
@@ -157,29 +155,15 @@ Install the development dependencies before running the full local checks:
 python -m pip install -e ".[dev]"
 python -m pytest
 ruff check .
-ruff format --check --config "format.line-ending = 'auto'" .
+ruff format --check .
 mypy --strict src
-bandit -c pyproject.toml -r src scripts
+bandit -c pyproject.toml -r src
 pip-audit --skip-editable
 python -m build
-python -B scripts/generate_baseline_inventory.py check
-```
-
-The local formatting command accepts the checkout's native line endings. CI
-additionally enforces the repository's configured LF line endings.
-
-The baseline artifact at
-[`artifacts/baseline/current_state.json`](artifacts/baseline/current_state.json)
-records the registered schemas, sample JSONL inventory, rubric and sample paths,
-and collected tests. Regenerate it only when its tracked inputs change:
-
-```bash
-python -B scripts/generate_baseline_inventory.py generate
 ```
 
 CI runs tests on Python 3.11, 3.12, and 3.13, then performs separate lint,
-formatting, type-checking, security, sample-data validation, baseline, and build
-checks.
+formatting, type-checking, security, sample-data validation, and build checks.
 
 ## Limitations
 
