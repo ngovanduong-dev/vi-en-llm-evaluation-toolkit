@@ -1,20 +1,12 @@
 # Contributing
 
 Thank you for helping improve the Vietnamese-English LLM Evaluation Toolkit.
-Review the current implementation and open public issues before proposing a
-change.
 
 ## Before starting
 
-1. Choose an existing public GitHub issue or open a focused issue before
-   implementation.
-2. Inspect the current implementation, tests, Git status, and relevant history.
-3. Define the scope, non-goals, acceptance criteria, compatibility impact, and
-   security or privacy risks.
-4. State the validation plan before changing files.
-
-Use a dedicated branch and keep one issue or tightly coupled vertical slice per
-pull request. Do not mix unrelated cleanup with feature work.
+Review the relevant code and tests, and check existing issues before making a
+change. Work on a focused branch and keep each contribution limited to one
+clear change. Avoid mixing unrelated cleanup with a feature or bug fix.
 
 ## Current development setup
 
@@ -53,7 +45,6 @@ shells, use `source .venv/bin/activate`.
 ## Pull requests
 
 Use [`.github/pull_request_template.md`](.github/pull_request_template.md).
-Report exact commands and results, compatibility and migration impact,
-security/privacy impact, known limitations, and unmet acceptance criteria.
-Never mark work complete when a required check or acceptance criterion is
-unmet.
+Summarize what changed and why, and list the validation commands you ran with
+their results. Use the optional notes section for compatibility, security,
+limitations, or follow-up information when it is relevant.

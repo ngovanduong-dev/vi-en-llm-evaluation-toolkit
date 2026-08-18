@@ -1,25 +1,7 @@
-## Issue
+## Summary
 
-## What changed
-
-## Why this design
-
-## Acceptance criteria
-
-- [ ]
+## Why
 
 ## Validation
 
-```text
-Exact commands and results
-```
-
-## Generated evidence
-
-## Migration and backwards compatibility
-
-## Security, privacy, and NDA
-
-## Known limitations
-
-## Follow-up
+## Notes
