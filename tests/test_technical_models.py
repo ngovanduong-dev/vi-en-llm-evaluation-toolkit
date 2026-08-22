@@ -10,6 +10,16 @@ from vi_en_eval.technical_models import (
     TechnicalRubricScores,
 )
 
+TECHNICAL_RUBRIC_FIELDS = (
+    "instruction_following",
+    "correctness",
+    "edge_case_handling",
+    "efficiency",
+    "maintainability",
+    "security_reliability",
+    "explanation_quality",
+)
+
 
 def valid_scores(score: int = 4) -> dict:
     return {
@@ -69,20 +79,40 @@ def test_valid_complete_pairwise_technical_evaluation():
     assert evaluation.confidence == 0.9
 
 
+def test_pairwise_technical_evaluation_json_round_trip():
+    original = PairwiseTechnicalEvaluation.model_validate(valid_pairwise_evaluation())
+
+    serialized = original.model_dump_json()
+    reconstructed = PairwiseTechnicalEvaluation.model_validate_json(serialized)
+
+    assert reconstructed == original
+
+
+@pytest.mark.parametrize("field", TECHNICAL_RUBRIC_FIELDS)
 @pytest.mark.parametrize("score", [1, 5])
-def test_technical_scores_accept_boundaries(score):
-    scores = TechnicalRubricScores.model_validate(valid_scores(score))
-
-    assert scores.correctness == score
-
-
-@pytest.mark.parametrize("score", [0, 6])
-def test_technical_scores_reject_values_outside_one_to_five(score):
+def test_technical_rubric_dimensions_accept_boundary_scores(field, score):
     payload = valid_scores()
-    payload["correctness"] = score
+    payload[field] = score
 
-    with pytest.raises(ValidationError):
+    scores = TechnicalRubricScores.model_validate(payload)
+
+    assert getattr(scores, field) == score
+
+
+@pytest.mark.parametrize("field", TECHNICAL_RUBRIC_FIELDS)
+@pytest.mark.parametrize(
+    ("score", "error_type"),
+    [(0, "greater_than_equal"), (6, "less_than_equal")],
+)
+def test_technical_rubric_dimensions_reject_out_of_range_scores(field, score, error_type):
+    payload = valid_scores()
+    payload[field] = score
+
+    with pytest.raises(ValidationError) as exc_info:
         TechnicalRubricScores.model_validate(payload)
+
+    assert exc_info.value.errors()[0]["loc"] == (field,)
+    assert exc_info.value.errors()[0]["type"] == error_type
 
 
 @pytest.mark.parametrize("confidence", [0, 1, 0.0, 1.0, 0.5, 0.9])
@@ -176,4 +206,26 @@ def test_technical_models_forbid_extra_fields(model_type: type[BaseModel], paylo
     with pytest.raises(ValidationError) as exc_info:
         model_type.model_validate(payload_with_extra)
 
+    assert exc_info.value.errors()[0]["type"] == "extra_forbidden"
+
+
+@pytest.mark.parametrize(
+    "container_path",
+    [
+        pytest.param(("candidate_a",), id="candidate-assessment"),
+        pytest.param(("candidate_a", "rubric_scores"), id="rubric-scores"),
+        pytest.param(("candidate_a", "detected_issues", 0), id="technical-issue"),
+    ],
+)
+def test_pairwise_evaluation_rejects_nested_extra_fields(container_path):
+    payload = valid_pairwise_evaluation()
+    nested_container = payload
+    for path_part in container_path:
+        nested_container = nested_container[path_part]
+    nested_container["unexpected"] = "value"
+
+    with pytest.raises(ValidationError) as exc_info:
+        PairwiseTechnicalEvaluation.model_validate(payload)
+
+    assert exc_info.value.errors()[0]["loc"] == (*container_path, "unexpected")
     assert exc_info.value.errors()[0]["type"] == "extra_forbidden"
