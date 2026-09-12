@@ -22,3 +22,13 @@ Vietnamese localization review.
 
 Evaluator rationales should be short, specific, and tied to the prompt rather
 than personal preference.
+
+## Dimension Boundaries
+
+Use the general rubric's seven dimensions when assigning general scores.
+Naturalness and register belong under language naturalness; changed meaning
+belongs under correctness; an omitted source component belongs under
+completeness. Poor wording can impair clarity without omitting information.
+Formatting concerns structure, and safety needs a concrete relevant risk.
+Explain each affected dimension separately rather than spreading a language
+penalty across unrelated fields. Severity describes impact, not a winner rule.

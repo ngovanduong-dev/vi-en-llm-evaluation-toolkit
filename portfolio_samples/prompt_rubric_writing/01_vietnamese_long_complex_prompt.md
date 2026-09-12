@@ -30,7 +30,7 @@ word-limit control, no unsupported blame, and a clear call to action.
 - Tone: polite and professional.
 - Required details: new class time and date.
 - Safety/context guardrail: do not blame teachers or parents.
-- Length limit: under 160 words.
+- Length limit: at most 160 words.
 
 ## Explicit Requirements
 
@@ -40,7 +40,7 @@ word-limit control, no unsupported blame, and a clear call to action.
 - Explain that the change supports class quality.
 - Invite parents to respond if the new schedule is not suitable.
 - Avoid emojis.
-- Stay under 160 words.
+- Use at most 160 words.
 
 ## Implicit Requirements
 
@@ -58,7 +58,7 @@ word-limit control, no unsupported blame, and a clear call to action.
 | Tone control | The response sounds polite, professional, and parent-facing. |
 | Constraint coverage | The response includes apology, reason, and response invitation. |
 | No unsupported blame | The response does not blame teachers, parents, or students. |
-| Length control | The response stays under 160 words. |
+| Length control | The response contains at most 160 words. |
 
 ## Objective Criteria
 

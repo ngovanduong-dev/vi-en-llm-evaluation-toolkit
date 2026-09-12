@@ -42,7 +42,7 @@ sometime next week? Thanks.
 | Criterion | Response A | Response B |
 | --- | ---: | ---: |
 | Instruction following | 5 | 2 |
-| Correctness | 5 | 2 |
+| Correctness | 4 | 2 |
 | Completeness | 4 | 2 |
 | Clarity | 5 | 3 |
 | Language naturalness | 5 | 3 |
@@ -56,7 +56,10 @@ Response A
 ## Reviewer Rationale
 
 Response A wins because it preserves the requested formal tone, states the
-two-day extension clearly, and avoids adding unsupported personal details.
+two-day extension clearly, and does not invent a personal excuse. However, A
+adds "Professor Nguyen," "history assignment," and "Minh," which the prompt
+does not supply and which are not marked as placeholders. These minor
+unsupported details prevent a perfect groundedness score.
 Response B is understandable, but it is too casual for a professor, changes the
 requested timeline to "sometime next week," and invents a family emergency that
 the user did not provide.
@@ -69,11 +72,15 @@ the user did not provide.
   two-day extension request.
 - **Unsupported detail, high severity:** Response B invents a family emergency,
   creating a hallucination-style issue.
+- **Unsupported specifics, low severity:** Response A inserts a professor name,
+  assignment subject, and student name without source support. Use generic
+  wording or clearly marked placeholders.
 
 ## Better Response Direction
 
 A stronger response should keep the message polite, name the exact extension
-requested, and avoid adding a reason unless the user supplies one.
+requested, and avoid adding a reason unless the user supplies one. Omit unknown
+names and assignment subjects or mark them as editable placeholders.
 
 ## Confidentiality Note
 
