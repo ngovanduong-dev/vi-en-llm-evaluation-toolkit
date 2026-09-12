@@ -8,19 +8,23 @@ evaluator judgments; validates JSONL datasets; calculates simple rubric
 summaries; exports reports; and performs lightweight checks on coding responses.
 
 The installed `vi-en-eval` command currently exposes JSONL validation. Scoring,
-report export, and coding-response checks are available as Python APIs.
+report export, coding-response checks, and technical dataset-integrity checks
+are available as Python APIs.
 
 ## What the Tool Does
 
-- Models prompt, response-pair, and evaluation records with strict Pydantic
-  schemas.
+- Models prompts, response pairs, legacy general judgments, and technical A/B
+  assessments with Pydantic field constraints and unknown-field rejection.
 - Validates JSONL syntax, required fields, enum values, score ranges, non-blank
   text, extra fields, and duplicate record IDs.
-- Calculates an average across seven rubric dimensions and assigns a simple
-  qualitative score band.
+- Checks selected cross-record relationships for typed technical datasets through
+  `validate_technical_dataset_integrity`.
+- Calculates an average across seven legacy general rubric dimensions and assigns
+  a descriptive qualitative band; this does not select the winner.
 - Normalizes common pairwise winner labels and builds compact evaluation
   summaries.
-- Renders individual evaluations as Markdown and exports summary rows as CSV.
+- Renders legacy general evaluations as Markdown and exports their summary rows
+  as CSV.
 - Checks Python syntax and validates JSON or JSONL text without executing
   generated code.
 
@@ -78,7 +82,7 @@ issues are found.
 
 ## Main Data Models
 
-The models are defined in
+The legacy general models are defined in
 [`src/vi_en_eval/schemas.py`](src/vi_en_eval/schemas.py).
 
 | Model | Purpose | Main fields |
@@ -93,8 +97,28 @@ Languages are `Vietnamese`, `English`, or `Bilingual`. Task types cover general,
 translation, coding, safety, reasoning, and localization work. Pairwise winners
 are `A`, `B`, or `Tie`.
 
+Technical models in
+[`src/vi_en_eval/technical_models.py`](src/vi_en_eval/technical_models.py) add:
+
+| Model | Purpose |
+| --- | --- |
+| `TechnicalRubricScores` | Seven per-candidate dimensions: instruction following, correctness, edge-case handling, efficiency, maintainability, security/reliability, explanation quality |
+| `TechnicalIssue` | One finding with a category, severity, description, and optional suggested fix |
+| `CandidateTechnicalAssessment` | One candidate's scores, findings, and rationale |
+| `PairwiseTechnicalEvaluation` | Separate A/B assessments, record references, A/B/Tie winner, confidence from 0 to 1, and overall rationale |
+
 All models reject unknown fields. IDs and required text fields must contain at
-least one non-whitespace character.
+least one non-whitespace character. These are individual-record structural and
+type contracts, not semantic verification. Some fields, including rubric scores,
+permit Pydantic coercion; this is not universally strict input typing.
+
+The technical integrity API in
+[`src/vi_en_eval/dataset_integrity.py`](src/vi_en_eval/dataset_integrity.py)
+accepts sequences of typed prompts, response pairs, and technical evaluations.
+It returns `DatasetIntegrityIssue` objects for duplicate IDs, missing references,
+and prompt-reference mismatches. It skips mismatch inference for ambiguous
+references to duplicate response-pair IDs. It does not load technical JSONL or
+provide a technical CLI schema.
 
 ## Evaluation and Scoring Capabilities
 
@@ -107,7 +131,15 @@ Scoring helpers in
 - compact summaries containing record references, winner, average score, score
   band, issue count, and rationale.
 
-Average scores use these fixed bands:
+Legacy general scores have no candidate attribution: they are not separate A/B
+scores or necessarily the winner's scores. Their mean summarizes stored numbers;
+it does not establish groundedness or automatically determine the stored winner.
+Technical assessments are candidate-specific and are not inputs to these general
+scoring/export helpers. Rubric anchors and interpretation are documented in
+[`rubrics/general_response_rubric.md`](rubrics/general_response_rubric.md) and
+[`rubrics/coding_response_rubric.md`](rubrics/coding_response_rubric.md).
+
+Average scores use these fixed descriptive bands:
 
 | Average | Band |
 | ---: | --- |
@@ -118,7 +150,7 @@ Average scores use these fixed bands:
 
 Report helpers in
 [`src/vi_en_eval/report_exporter.py`](src/vi_en_eval/report_exporter.py) render
-one evaluation as Markdown or export multiple evaluation summaries as CSV. A
+one legacy general evaluation as Markdown or export general summaries as CSV. A
 sample output is available at
 [`reports/sample_evaluation_report.md`](reports/sample_evaluation_report.md).
 
@@ -169,15 +201,22 @@ formatting, type-checking, security, sample-data validation, and build checks.
 
 - The CLI validates JSONL only; it does not run model inference, score model
   outputs, or export reports from the command line.
-- Validation is per file. It does not check relationships between prompt,
-  response-pair, and evaluation files.
-- An evaluation stores one rubric-score set and one pairwise winner rather than
-  separate criterion scores for both responses.
-- Scoring is an unweighted average with fixed bands. There are no calibrated
-  judges, agreement statistics, uncertainty estimates, or regression tests for
-  model quality.
-- Python checks parse syntax only. Generated code is never executed, tested, or
-  sandboxed by this toolkit.
+- The CLI registers only `prompt`, `response`, and legacy `evaluation` schemas
+  and validates files independently. Selected cross-record technical checks are
+  available through the separate typed Python API described above.
+- Legacy general judgments retain one pair-level score set without candidate
+  attribution; technical judgments have separate A/B assessments. Historical
+  general numbers cannot be reconstructed as candidate ratings when their
+  original scoring basis is unknown.
+- General score means and bands are descriptive. Technical evaluator confidence
+  is stored, not calibrated. There are no calibrated judges, agreement statistics,
+  statistical uncertainty estimates, or regression tests for model quality.
+- Individual-record validation and technical relationship checks do not establish
+  the truth of a rationale, correct rubric use, or a supported winner. Missing
+  source evidence must be addressed in the judgment itself.
+- Python checks use `ast.parse` only; successful AST construction does not prove
+  compilation or runtime correctness. Generated code is never executed, tested,
+  or sandboxed by the toolkit APIs or CLI.
 - The bundled records are small synthetic examples, not a representative
   benchmark or evidence of production model performance.
 

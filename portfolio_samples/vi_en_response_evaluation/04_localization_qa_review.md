@@ -36,11 +36,11 @@ Sự chuyển khoản của bạn đang bị đánh giá. Chúng tôi sẽ báo 
 | --- | ---: | ---: |
 | Instruction following | 5 | 2 |
 | Correctness | 5 | 3 |
-| Completeness | 5 | 3 |
+| Completeness | 5 | 5 |
 | Clarity | 5 | 3 |
 | Language naturalness | 5 | 1 |
-| Formatting | 5 | 4 |
-| Safety | 5 | 3 |
+| Formatting | 5 | 5 |
+| Safety | 5 | 5 |
 
 ## Winner
 
@@ -53,6 +53,17 @@ chuyển tiền" and "đang được xem xét" are clear, professional, and not 
 alarming. Response B is an over-literal translation. "Sự chuyển khoản" is
 unnatural, "đang bị đánh giá" sounds negative or punitive, and "khi nó xong" is
 too casual for financial messaging.
+
+B retains both informational components: the transfer is under review and a
+notification will follow completion. Completeness is therefore 5. Both short
+sentences are readable in structure, so formatting is 5. No harmful instruction,
+privacy disclosure, or other concrete safety issue is identified, so safety is 5.
+These scores do not imply good language quality. Language naturalness remains 1.
+Correctness remains 3 because "đang bị đánh giá" shifts a neutral review toward
+a negative evaluation; clarity remains 3 because the awkward wording makes the
+status harder to understand. Instruction following remains 2 because the task
+explicitly requires natural, professional, reassuring language. Each deduction
+addresses a distinct effect rather than an omitted informational component.
 
 ## Key Issues Found
 
