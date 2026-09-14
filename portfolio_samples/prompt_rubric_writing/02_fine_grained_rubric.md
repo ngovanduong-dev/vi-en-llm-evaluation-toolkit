@@ -16,14 +16,14 @@ criteria that a reviewer can apply consistently.
 - Evaluate two responses, not just one.
 - Focus on Vietnamese customer-service quality.
 - Consider empathy, professionalism, specificity, and blame avoidance.
-- Select a winner and explain the tradeoff.
+- Explain the comparison; use a preference only where supported.
 
 ## Explicit Requirements
 
 - Compare two responses.
 - Judge customer-service tone.
 - Prefer an answer that does not blame the customer.
-- Explain why one answer is stronger.
+- Compare against empathy, professionalism, specificity, and blame avoidance.
 
 ## Implicit Requirements
 
@@ -44,10 +44,17 @@ criteria that a reviewer can apply consistently.
 
 ## Objective Criteria
 
-- The winner is explicitly stated.
-- The rationale mentions at least one strength and one weakness.
-- The response does not add a factual cause not present in the prompt.
+- The review addresses both candidate responses.
 - The review identifies whether customer blame is present.
+- Any factual delay cause asserted by a candidate is checked against supplied
+  evidence; the scenario alone supplies no cause.
+
+The empathy, tone, constraint, specificity, and localization rows assess the
+customer-service candidates. Rationale quality assesses the evaluator's review.
+These are distinct targets, not one score set. A winner label and discussion of
+strengths and weaknesses can help explain a comparison, but the source does not
+explicitly require either. Do not invent a weakness or force a winner when the
+evidence supports a Tie. No candidate pair is supplied in this rubric exercise.
 
 ## Subjective Criteria
 
