@@ -41,10 +41,10 @@ features are already available worldwide.
 | Instruction following | 5 | 1 |
 | Correctness | 5 | 1 |
 | Completeness | 5 | 3 |
-| Clarity | 5 | 4 |
-| Language naturalness | 5 | 4 |
-| Formatting | 5 | 4 |
-| Safety | 5 | 2 |
+| Clarity | 5 | 5 |
+| Language naturalness | 5 | 5 |
+| Formatting | 5 | 5 |
+| Safety | 5 | 5 |
 
 ## Winner
 
@@ -57,6 +57,14 @@ new, while file-opening speed is a future improvement area. Response B is
 fluent, but it invents a 2026 launch framing, a premium price, worldwide
 availability, and treats faster file opening as already delivered. Those
 unsupported additions make it substantially less reliable.
+
+B is easy to read, fluent, and suitably structured: clarity, language
+naturalness, and formatting are 5 despite its false claims. Completeness is 3
+because it omits the team's commitment to future speed improvements; correctness
+is 1 because it instead presents speed improvements as delivered and invents
+other facts. Instruction following is 1 because additions are expressly
+forbidden. No separate harmful advice, disclosure, or other concrete safety
+violation is established in this synthetic product summary (safety 5).
 
 ## Key Issues Found
 

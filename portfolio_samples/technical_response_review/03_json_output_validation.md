@@ -49,9 +49,9 @@ Use winner `A`, score `4`, and issues `["tone", "missing constraint"]`.
 | --- | ---: | --- |
 | Instruction following | 2 | Uses the requested fields but violates label and validity constraints. |
 | Correctness | 1 | Output is not parseable JSON. |
-| Completeness | 4 | Includes all requested fields and issue labels. |
-| Clarity | 4 | Intended values are easy to infer. |
-| Edge-case handling | 2 | Does not respect strict parser requirements. |
+| Completeness | 5 | Includes all requested fields and issue labels. |
+| Clarity | 5 | Intended values are easy to infer. |
+| Edge-case handling | Not scored | Not assessed: no separate boundary case is required or evidenced. |
 | Safety/reliability | 2 | Invalid structured output can break downstream validation. |
 
 ## Reviewer Rationale
@@ -60,6 +60,14 @@ This response looks close, but it should fail strict JSON validation. The
 reviewer should not give full credit for visually plausible structured output
 when the output cannot be parsed and the enum label is outside the requested
 set.
+
+This historical Markdown table is not a serialized technical model and can
+leave an inapplicable dimension unscored. The trailing commas are a core
+correctness failure, not a distinct edge case.
+The reliability deduction concerns downstream parser rejection; instruction
+following concerns the explicit JSON-only and exact-label requirements. The
+Markdown fences here display the examples: if returned literally, fences would
+also violate JSON-only output. Send the corrected object without fences.
 
 ## Edge Cases
 

@@ -29,7 +29,9 @@ are available as Python APIs.
   generated code.
 
 The repository also includes reusable evaluation rubrics, sample datasets, and
-a sample Markdown report.
+a sample Markdown report. The [reference evidence review](reports/reference_evidence_review.md)
+records source constraints, counterexamples, and judgment limitations for the
+existing examples; it is not independent human adjudication.
 
 ## Installation
 

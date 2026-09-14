@@ -29,7 +29,7 @@ word-limit control, no unsupported blame, and a clear call to action.
 - Format: email-style announcement.
 - Tone: polite and professional.
 - Required details: new class time and date.
-- Safety/context guardrail: do not blame teachers or parents.
+- Tone/context constraint: do not blame teachers or parents.
 - Length limit: at most 160 words.
 
 ## Explicit Requirements

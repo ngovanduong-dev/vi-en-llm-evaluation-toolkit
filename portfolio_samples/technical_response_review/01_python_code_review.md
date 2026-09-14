@@ -32,8 +32,11 @@ The code loops through the list and averages the positive values.
 
 ## Controlled Reproduction
 
-The reviewed synthetic snippet was checked as written, then a scratch copy was
-run after adding only the missing colon (Python 3.13.9). The original produces
+The reviewed synthetic snippet was parsed as written, then a static test fixture
+was run after adding only the missing colon (Python 3.13.9).
+[`tests/test_python_review_reference.py`](../../tests/test_python_review_reference.py)
+checks that the fixture matches this colon-only repair by comparing parsed
+structure; it never executes text extracted from this document. The original produces
 `SyntaxError: expected ':'` at line 4, column 21, before any function call.
 
 | Input | Colon-only result | Required result |
