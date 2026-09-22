@@ -11,6 +11,7 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from vi_en_eval._json import JsonPolicyError, decode_json
 from vi_en_eval.schemas import SCHEMA_REGISTRY
 
 
@@ -68,7 +69,11 @@ def _schema_issue(line_number: int, error: Mapping[str, Any]) -> ValidationIssue
 
 
 def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlValidationResult:
-    """Validate a JSONL file against one of the registered Pydantic schemas."""
+    """Validate JSON transport, registered schema, and duplicate record IDs.
+
+    Blank physical lines are invalid. File and UTF-8 decoding failures propagate
+    to callers; the CLI converts them to controlled failures without partial counts.
+    """
 
     file_path = Path(path)
     if schema_name not in SCHEMA_REGISTRY:
@@ -84,9 +89,9 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
     with file_path.open("r", encoding="utf-8") as handle:
         for line_number, raw_line in enumerate(handle, start=1):
             total_lines += 1
-            line = raw_line.strip()
+            line = raw_line.rstrip("\r\n")
 
-            if not line:
+            if not line.strip():
                 issues.append(
                     ValidationIssue(
                         line_number=line_number,
@@ -97,7 +102,12 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
                 continue
 
             try:
-                payload = json.loads(line)
+                payload = decode_json(line)
+            except JsonPolicyError as exc:
+                issues.append(
+                    ValidationIssue(line_number=line_number, code=exc.code, message=str(exc))
+                )
+                continue
             except json.JSONDecodeError as exc:
                 issues.append(
                     ValidationIssue(
@@ -176,7 +186,29 @@ def main(argv: list[str] | None = None) -> int:
     """Run JSONL validation and return a process-compatible exit code."""
 
     args = create_argument_parser().parse_args(argv)
-    result = validate_jsonl(args.path, schema_name=args.schema)
+    try:
+        result = validate_jsonl(args.path, schema_name=args.schema)
+    except (OSError, UnicodeDecodeError) as exc:
+        code = "invalid_utf8" if isinstance(exc, UnicodeDecodeError) else "file_read_error"
+        message = (
+            "Input is not valid UTF-8" if code == "invalid_utf8" else "Unable to read input file"
+        )
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "file_path": args.path,
+                        "schema_name": args.schema,
+                        "is_valid": False,
+                        "error": {"code": code, "message": message},
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+        else:
+            print(f"ERROR: {args.path}: {code}: {message}")
+        return 1
     if args.json:
         print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
     else:

@@ -5,6 +5,9 @@ from __future__ import annotations
 import ast
 import json
 from dataclasses import dataclass
+from io import StringIO
+
+from vi_en_eval._json import JsonPolicyError, decode_json
 
 CODING_REVIEW_CHECKLIST = [
     "Syntax error",
@@ -52,10 +55,12 @@ def check_python_syntax(source: str) -> CheckResult:
 
 
 def validate_json_text(value: str) -> CheckResult:
-    """Check whether a string is valid JSON."""
+    """Check JSON syntax, rejecting non-finite literals and duplicate object names."""
 
     try:
-        json.loads(value)
+        decode_json(value)
+    except JsonPolicyError as exc:
+        return CheckResult(is_valid=False, code=exc.code, message=str(exc))
     except json.JSONDecodeError as exc:
         return CheckResult(
             is_valid=False,
@@ -73,11 +78,11 @@ def validate_json_text(value: str) -> CheckResult:
 
 
 def validate_jsonl_text(value: str) -> list[CheckResult]:
-    """Validate each non-empty line in a JSONL text block."""
+    """Validate physical JSONL lines (LF, CRLF, or CR); reject blank lines."""
 
     results: list[CheckResult] = []
 
-    for line_number, line in enumerate(value.splitlines(), start=1):
+    for line_number, line in enumerate(StringIO(value, newline=None), start=1):
         if not line.strip():
             results.append(
                 CheckResult(
@@ -89,7 +94,7 @@ def validate_jsonl_text(value: str) -> list[CheckResult]:
             )
             continue
 
-        result = validate_json_text(line)
+        result = validate_json_text(line.rstrip("\r\n"))
         if result.is_valid:
             results.append(
                 CheckResult(
