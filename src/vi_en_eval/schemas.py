@@ -64,13 +64,13 @@ class RubricScores(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    instruction_following: int = Field(ge=1, le=5)
-    correctness: int = Field(ge=1, le=5)
-    completeness: int = Field(ge=1, le=5)
-    clarity: int = Field(ge=1, le=5)
-    language_naturalness: int = Field(ge=1, le=5)
-    formatting: int = Field(ge=1, le=5)
-    safety: int = Field(ge=1, le=5)
+    instruction_following: int = Field(strict=True, ge=1, le=5)
+    correctness: int = Field(strict=True, ge=1, le=5)
+    completeness: int = Field(strict=True, ge=1, le=5)
+    clarity: int = Field(strict=True, ge=1, le=5)
+    language_naturalness: int = Field(strict=True, ge=1, le=5)
+    formatting: int = Field(strict=True, ge=1, le=5)
+    safety: int = Field(strict=True, ge=1, le=5)
 
     def average(self) -> float:
         """Return the arithmetic mean of all rubric dimensions."""

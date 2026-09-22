@@ -79,8 +79,14 @@ The validator can also be invoked as a Python module:
 python -m vi_en_eval.jsonl_validator data/sample_evaluations.jsonl --schema evaluation
 ```
 
-The command exits with status `0` for a valid file and `1` when validation
-issues are found.
+The command exits with status `0` for a valid file and `1` for validation or
+file/UTF-8 read failures (`2` remains argparse's usage-error status). Expected
+read failures print a concise error with the supplied path, without a traceback
+or file contents. With `--json`, they return `file_path`, `schema_name`,
+`is_valid: false`, and an `error` object with `code` (`file_read_error` or
+`invalid_utf8`) and `message`; partial record counts are not reported. Successful
+and dataset-validation result structures are unchanged. The Python
+`validate_jsonl` API continues to raise file/encoding exceptions.
 
 ## Main Data Models
 
@@ -111,8 +117,11 @@ Technical models in
 
 All models reject unknown fields. IDs and required text fields must contain at
 least one non-whitespace character. These are individual-record structural and
-type contracts, not semantic verification. Some fields, including rubric scores,
-permit Pydantic coercion; this is not universally strict input typing.
+type contracts, not semantic verification. Both rubric score models require
+actual integers from 1 through 5: booleans, numeric strings, floats (including
+`1.0`), and null are rejected. This intentionally tightens previously coercible
+inputs; enum strings and evaluator-confidence semantics remain unchanged. Other
+fields are not made globally strict.
 
 The technical integrity API in
 [`src/vi_en_eval/dataset_integrity.py`](src/vi_en_eval/dataset_integrity.py)
@@ -158,9 +167,21 @@ sample output is available at
 
 Lightweight coding-response checks in
 [`src/vi_en_eval/code_checks.py`](src/vi_en_eval/code_checks.py) parse Python
-syntax and validate JSON or JSONL text. The Markdown files in [`rubrics/`](rubrics/)
-cover general responses, Vietnamese-English language QA, coding responses, and
-prompt/rubric quality.
+syntax and validate JSON or JSONL text. Toolkit `validate_json_text`,
+`validate_jsonl_text`, and file/CLI JSONL validation reject `NaN`, `Infinity`,
+`-Infinity`, and duplicate object names at every nesting level. This transport
+policy does not override external Pydantic `model_validate_json` calls. Normal
+JSON primitives and arrays remain valid for text syntax checks; file validation
+also checks the selected record schema and duplicate record IDs.
+
+JSONL checks use physical LF, CRLF, or CR lines and reject blank lines; one
+trailing newline does not create a blank record. Policy errors identify the
+physical JSONL line without inventing a character column. Syntax errors retain
+parser diagnostics. These checks establish transport/schema validity, not
+semantic evaluator correctness, and are not a security parser. Standard-library
+numeric precision and resource limits still apply. The Markdown files in
+[`rubrics/`](rubrics/) cover general responses, Vietnamese-English language QA,
+coding responses, and prompt/rubric quality.
 
 ## Project Structure
 

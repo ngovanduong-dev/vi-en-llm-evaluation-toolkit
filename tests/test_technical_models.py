@@ -229,3 +229,21 @@ def test_pairwise_evaluation_rejects_nested_extra_fields(container_path):
 
     assert exc_info.value.errors()[0]["loc"] == (*container_path, "unexpected")
     assert exc_info.value.errors()[0]["type"] == "extra_forbidden"
+
+
+@pytest.mark.parametrize("score", [1, 3, 5])
+def test_rubric_accepts_actual_integers(score):
+    scores = TechnicalRubricScores.model_validate(
+        dict.fromkeys(TechnicalRubricScores.model_fields, score)
+    )
+    assert all(type(value) is int and value == score for value in scores.model_dump().values())
+
+
+@pytest.mark.parametrize("score", [True, False, "1", "5", 1.0, 5.0, None, 0, 6])
+def test_rubric_rejects_invalid_values_in_every_dimension(score):
+    for field in TechnicalRubricScores.model_fields:
+        payload = dict.fromkeys(TechnicalRubricScores.model_fields, 3)
+        payload[field] = score
+        with pytest.raises(ValidationError) as exc_info:
+            TechnicalRubricScores.model_validate(payload)
+        assert exc_info.value.errors()[0]["loc"] == (field,)

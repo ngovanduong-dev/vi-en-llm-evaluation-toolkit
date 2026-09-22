@@ -1,5 +1,8 @@
 import json
+import subprocess
+import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -181,3 +184,116 @@ def test_cli_returns_nonzero_and_lists_issues(tmp_path, capsys):
     assert exit_code == 1
     assert "INVALID:" in captured.out
     assert "blank_line" in captured.out
+
+
+@pytest.mark.parametrize(
+    ("bad_line", "code"),
+    [
+        ('{"id":"a","id":"b"}', "duplicate_json_key"),
+        ('{"outer":{"secret":1,"secret":2}}', "duplicate_json_key"),
+        *[
+            (f'{{"score":{literal}}}', "non_finite_number")
+            for literal in ("NaN", "Infinity", "-Infinity")
+        ],
+        ("null", "schema_validation_error"),
+        ("   {", "malformed_json"),
+    ],
+)
+def test_file_transport_schema_and_id_rules_are_separate(tmp_path, bad_line, code):
+    row = json.dumps(valid_evaluation_record())
+    path = tmp_path / "mixed.jsonl"
+    path.write_text("\n".join([bad_line, "", row, row]) + "\n", encoding="utf-8")
+    result = validate_jsonl(path)
+    assert result.total_lines == 4
+    assert result.valid_records == 1
+    assert [(issue.line_number, issue.code) for issue in result.issues] == [
+        (1, code),
+        (2, "blank_line"),
+        (4, "duplicate_id"),
+    ]
+    if code == "malformed_json":
+        assert "column 5" in result.issues[0].message
+    if code in {"duplicate_json_key", "non_finite_number"}:
+        assert "column" not in result.issues[0].message
+        assert "secret" not in result.issues[0].message
+
+
+@pytest.mark.parametrize("machine", [False, True])
+@pytest.mark.parametrize("case", ["valid", "invalid", "missing", "invalid_utf8"])
+def test_cli_subprocess_contract(tmp_path, machine, case):
+    path = tmp_path / "input.jsonl"
+    if case == "valid":
+        write_jsonl(path, [valid_evaluation_record()])
+    elif case == "invalid":
+        path.write_text('{"private_marker":NaN}', encoding="utf-8")
+    elif case == "invalid_utf8":
+        path.write_bytes(b"private_marker\xff")
+    command = [sys.executable, "-m", "vi_en_eval.jsonl_validator", str(path)]
+    if machine:
+        command.append("--json")
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    assert result.returncode == (0 if case == "valid" else 1)
+    assert result.stderr == ""
+    assert "private_marker" not in result.stdout
+    if machine:
+        payload = json.loads(result.stdout)
+        assert payload["file_path"] == str(path)
+        assert payload["is_valid"] is (case == "valid")
+        if case in {"missing", "invalid_utf8"}:
+            assert payload["error"]["code"] == (
+                "invalid_utf8" if case == "invalid_utf8" else "file_read_error"
+            )
+            assert "valid_records" not in payload
+        else:
+            assert set(payload) == {
+                "file_path",
+                "schema_name",
+                "total_lines",
+                "valid_records",
+                "is_valid",
+                "issues",
+            }
+    else:
+        assert str(path) in result.stdout
+        assert result.stdout.startswith(
+            "VALID:" if case == "valid" else "INVALID:" if case == "invalid" else "ERROR:"
+        )
+
+
+@pytest.mark.parametrize("machine", [False, True])
+@pytest.mark.parametrize("during_read", [False, True])
+def test_cli_controls_oserror_without_exception_details(tmp_path, capsys, machine, during_read):
+    args = [str(tmp_path / "input.jsonl")]
+    if machine:
+        args.append("--json")
+    with patch.object(Path, "open") as mocked_open:
+        if during_read:
+            mocked_open.return_value.__enter__.return_value.__iter__.side_effect = OSError(
+                "private_marker"
+            )
+        else:
+            mocked_open.side_effect = PermissionError("private_marker")
+        assert main(args) == 1
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert "private_marker" not in captured.out
+    assert "file_read_error" in captured.out
+    if machine:
+        assert json.loads(captured.out)["error"]["code"] == "file_read_error"
+
+
+def test_cli_does_not_hide_programming_errors():
+    with patch("vi_en_eval.jsonl_validator.validate_jsonl", side_effect=RuntimeError("defect")):
+        with pytest.raises(RuntimeError, match="defect"):
+            main(["input.jsonl"])
+
+
+@pytest.mark.parametrize("score", [True, "1", 1.0])
+def test_file_reports_coercible_scores_as_schema_errors(tmp_path, score):
+    row = valid_evaluation_record()
+    row["rubric_scores"]["correctness"] = score
+    path = write_jsonl(tmp_path / "score.jsonl", [row])
+    result = validate_jsonl(path)
+    assert [(issue.code, issue.field) for issue in result.issues] == [
+        ("schema_validation_error", "rubric_scores.correctness")
+    ]

@@ -1,7 +1,13 @@
 import pytest
 from pydantic import ValidationError
 
-from vi_en_eval.schemas import DetectedIssue, EvaluationRecord, PromptRecord, ResponsePairRecord
+from vi_en_eval.schemas import (
+    DetectedIssue,
+    EvaluationRecord,
+    PromptRecord,
+    ResponsePairRecord,
+    RubricScores,
+)
 
 
 def valid_evaluation_record() -> dict:
@@ -103,3 +109,19 @@ def test_detected_issue_rejects_whitespace_only_text_fields(field):
         DetectedIssue.model_validate(payload)
 
     assert exc_info.value.errors()[0]["loc"] == (field,)
+
+
+@pytest.mark.parametrize("score", [1, 3, 5])
+def test_rubric_accepts_actual_integers(score):
+    scores = RubricScores.model_validate(dict.fromkeys(RubricScores.model_fields, score))
+    assert all(type(value) is int and value == score for value in scores.model_dump().values())
+
+
+@pytest.mark.parametrize("score", [True, False, "1", "5", 1.0, 5.0, None, 0, 6])
+def test_rubric_rejects_invalid_values_in_every_dimension(score):
+    for field in RubricScores.model_fields:
+        payload = dict.fromkeys(RubricScores.model_fields, 3)
+        payload[field] = score
+        with pytest.raises(ValidationError) as exc_info:
+            RubricScores.model_validate(payload)
+        assert exc_info.value.errors()[0]["loc"] == (field,)

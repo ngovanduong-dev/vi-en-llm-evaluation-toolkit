@@ -39,13 +39,13 @@ class TechnicalRubricScores(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    instruction_following: int = Field(ge=1, le=5)
-    correctness: int = Field(ge=1, le=5)
-    edge_case_handling: int = Field(ge=1, le=5)
-    efficiency: int = Field(ge=1, le=5)
-    maintainability: int = Field(ge=1, le=5)
-    security_reliability: int = Field(ge=1, le=5)
-    explanation_quality: int = Field(ge=1, le=5)
+    instruction_following: int = Field(strict=True, ge=1, le=5)
+    correctness: int = Field(strict=True, ge=1, le=5)
+    edge_case_handling: int = Field(strict=True, ge=1, le=5)
+    efficiency: int = Field(strict=True, ge=1, le=5)
+    maintainability: int = Field(strict=True, ge=1, le=5)
+    security_reliability: int = Field(strict=True, ge=1, le=5)
+    explanation_quality: int = Field(strict=True, ge=1, le=5)
 
 
 class CandidateTechnicalAssessment(BaseModel):
