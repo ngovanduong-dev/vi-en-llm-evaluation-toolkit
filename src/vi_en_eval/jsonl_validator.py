@@ -7,9 +7,9 @@ import json
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Generic, TypeVar
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from vi_en_eval._json import JsonPolicyError, decode_json
 from vi_en_eval.schemas import SCHEMA_REGISTRY
@@ -54,6 +54,17 @@ class JsonlValidationResult:
         }
 
 
+_ModelT = TypeVar("_ModelT", bound=BaseModel)
+
+
+@dataclass(frozen=True)
+class _TypedJsonlValidationResult(Generic[_ModelT]):
+    """Validated records plus the existing file-validation summary."""
+
+    validation: JsonlValidationResult
+    records: tuple[_ModelT, ...]
+
+
 def _field_path(error_location: tuple[Any, ...]) -> str:
     return ".".join(str(part) for part in error_location)
 
@@ -68,20 +79,15 @@ def _schema_issue(line_number: int, error: Mapping[str, Any]) -> ValidationIssue
     )
 
 
-def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlValidationResult:
-    """Validate JSON transport, registered schema, and duplicate record IDs.
-
-    Blank physical lines are invalid. File and UTF-8 decoding failures propagate
-    to callers; the CLI converts them to controlled failures without partial counts.
-    """
-
+def _load_typed_jsonl(
+    path: str | Path,
+    schema_name: str,
+    model: type[_ModelT],
+) -> _TypedJsonlValidationResult[_ModelT]:
+    """Load typed JSONL records while applying the established file contract."""
     file_path = Path(path)
-    if schema_name not in SCHEMA_REGISTRY:
-        allowed = ", ".join(sorted(SCHEMA_REGISTRY))
-        raise ValueError(f"Unknown schema '{schema_name}'. Expected one of: {allowed}")
-
-    model = SCHEMA_REGISTRY[schema_name]
     issues: list[ValidationIssue] = []
+    records: list[_ModelT] = []
     seen_ids: set[str] = set()
     total_lines = 0
     valid_records = 0
@@ -119,7 +125,7 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
                 continue
 
             try:
-                model.model_validate(payload)
+                record = model.model_validate(payload)
             except ValidationError as exc:
                 issues.extend(_schema_issue(line_number, error) for error in exc.errors())
                 continue
@@ -137,15 +143,33 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
                 continue
 
             seen_ids.add(record_id)
+            records.append(record)
             valid_records += 1
 
-    return JsonlValidationResult(
-        file_path=str(file_path),
-        schema_name=schema_name,
-        total_lines=total_lines,
-        valid_records=valid_records,
-        issues=issues,
+    return _TypedJsonlValidationResult(
+        validation=JsonlValidationResult(
+            file_path=str(file_path),
+            schema_name=schema_name,
+            total_lines=total_lines,
+            valid_records=valid_records,
+            issues=issues,
+        ),
+        records=tuple(records),
     )
+
+
+def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlValidationResult:
+    """Validate JSON transport, registered schema, and duplicate record IDs.
+
+    Blank physical lines are invalid. File and UTF-8 decoding failures propagate
+    to callers; the CLI converts them to controlled failures without partial counts.
+    """
+
+    if schema_name not in SCHEMA_REGISTRY:
+        allowed = ", ".join(sorted(SCHEMA_REGISTRY))
+        raise ValueError(f"Unknown schema '{schema_name}'. Expected one of: {allowed}")
+
+    return _load_typed_jsonl(path, schema_name, SCHEMA_REGISTRY[schema_name]).validation
 
 
 def format_validation_result(result: JsonlValidationResult) -> str:

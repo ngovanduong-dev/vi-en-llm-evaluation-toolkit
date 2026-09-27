@@ -13,6 +13,10 @@ The project does not yet have a tagged release history.
   console command.
 - Ruff, strict mypy, branch coverage, Bandit, dependency audit, and package build
   quality gates.
+- A typed linked technical-dataset loader and the `vi-en-dataset` command with
+  deterministic read, transport, schema, duplicate-ID, and integrity diagnostics.
+- A synthetic three-case Python review dataset with reviewed executable evidence
+  for one-shot iteration, repeated-call state leakage, and stable deduplication.
 
 ### Changed
 
