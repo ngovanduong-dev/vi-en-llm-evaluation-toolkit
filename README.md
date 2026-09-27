@@ -7,9 +7,10 @@ It provides typed records for prompts, response pairs, rubric scores, and
 evaluator judgments; validates JSONL datasets; calculates simple rubric
 summaries; exports reports; and performs lightweight checks on coding responses.
 
-The installed `vi-en-eval` command currently exposes JSONL validation. Scoring,
-report export, coding-response checks, and technical dataset-integrity checks
-are available as Python APIs.
+The installed `vi-en-eval` command exposes single-file JSONL validation. The
+additive `vi-en-dataset` command loads three linked technical collections,
+validates them as one dataset, and returns deterministic diagnostics. Scoring,
+report export, and coding-response checks are also available as Python APIs.
 
 ## What the Tool Does
 
@@ -17,8 +18,8 @@ are available as Python APIs.
   assessments with Pydantic field constraints and unknown-field rejection.
 - Validates JSONL syntax, required fields, enum values, score ranges, non-blank
   text, extra fields, and duplicate record IDs.
-- Checks selected cross-record relationships for typed technical datasets through
-  `validate_technical_dataset_integrity`.
+- Loads linked technical prompt, response-pair, and evaluation JSONL files as
+  typed records and checks their cross-record relationships.
 - Calculates an average across seven legacy general rubric dimensions and assigns
   a descriptive qualitative band; this does not select the winner.
 - Normalizes common pairwise winner labels and builds compact evaluation
@@ -88,6 +89,59 @@ or file contents. With `--json`, they return `file_path`, `schema_name`,
 and dataset-validation result structures are unchanged. The Python
 `validate_jsonl` API continues to raise file/encoding exceptions.
 
+### Linked Technical Dataset
+
+Validate the bundled technical Python case pack from a clone:
+
+```bash
+vi-en-dataset \
+  --prompts data/technical_python/prompts.jsonl \
+  --responses data/technical_python/response_pairs.jsonl \
+  --evaluations data/technical_python/technical_evaluations.jsonl
+```
+
+Add `--json` for stable machine-readable output. The command exits `0` only
+when every file and relationship is valid, `1` for read, UTF-8, transport,
+schema, duplicate-ID, or integrity failures, and `2` for argparse usage errors.
+It distinguishes malformed JSON from strict JSON-policy failures, including
+duplicate object names and non-finite numeric literals.
+
+The workflow validates layers in order:
+
+1. Read each file as UTF-8 and apply the shared strict JSON transport policy.
+2. Validate each row against `PromptRecord`, `ResponsePairRecord`, or
+   `PairwiseTechnicalEvaluation`, including duplicate IDs within each file.
+3. Only when all three files pass, run
+   `validate_technical_dataset_integrity` for missing links and prompt-reference
+   mismatches.
+
+Skipping step 3 after a file-level failure prevents misleading missing-link
+errors caused only by a rejected row. JSON output exposes this decision through
+`integrity_checked`. Duplicate IDs remain invalid and ambiguous; the loader does
+not choose a first or last record.
+
+Python callers use `load_technical_dataset`. A valid result exposes a
+`TechnicalDataset` containing tuples of typed prompts, response pairs, and
+technical evaluations. Invalid results set `dataset` to `None` and retain
+deterministically ordered diagnostics.
+
+The included cases cover a one-shot iterable mean, repeated-call mutable-state
+leakage, and stable deduplication with unhashable inputs. The
+[case evidence guide](data/technical_python/EVIDENCE.md) maps each judgment to a
+minimal counterexample and committed reviewed fixture. Reproduce it with:
+
+```bash
+python -m pytest tests/test_technical_case_evidence.py
+```
+
+Candidate response strings remain inert data. The toolkit does not evaluate,
+execute, import, or pass them to a subprocess; tests call separate reviewed
+fixtures. These examples are synthetic exercises, not representative benchmark
+coverage. Their winners, scores, rationales, and confidence values remain human
+evaluator judgments: schema and integrity success does not verify their semantic
+correctness, confidence is not calibrated probability, and no agreement,
+performance, or calibration claim follows from this dataset.
+
 ## Main Data Models
 
 The legacy general models are defined in
@@ -123,13 +177,14 @@ actual integers from 1 through 5: booleans, numeric strings, floats (including
 inputs; enum strings and evaluator-confidence semantics remain unchanged. Other
 fields are not made globally strict.
 
-The technical integrity API in
+The low-level technical integrity API in
 [`src/vi_en_eval/dataset_integrity.py`](src/vi_en_eval/dataset_integrity.py)
 accepts sequences of typed prompts, response pairs, and technical evaluations.
 It returns `DatasetIntegrityIssue` objects for duplicate IDs, missing references,
 and prompt-reference mismatches. It skips mismatch inference for ambiguous
-references to duplicate response-pair IDs. It does not load technical JSONL or
-provide a technical CLI schema.
+references to duplicate response-pair IDs. The linked-file workflow in
+[`src/vi_en_eval/technical_dataset.py`](src/vi_en_eval/technical_dataset.py)
+composes that API with the existing JSON transport and model contracts.
 
 ## Evaluation and Scoring Capabilities
 
@@ -187,7 +242,7 @@ coding responses, and prompt/rubric quality.
 
 ```text
 src/vi_en_eval/       Package schemas, validation, scoring, export, and checks.
-data/                 Synthetic JSONL prompt, response, and evaluation records.
+data/                 Synthetic legacy and linked technical JSONL records.
 rubrics/              Human-readable evaluation rubrics.
 reports/              Example report output.
 portfolio_samples/    Additional human-readable synthetic review examples.
@@ -218,15 +273,16 @@ python -m build
 ```
 
 CI runs tests on Python 3.11, 3.12, and 3.13, then performs separate lint,
-formatting, type-checking, security, sample-data validation, and build checks.
+formatting, type-checking, security, legacy and technical sample-data validation,
+and build checks.
 
 ## Limitations
 
-- The CLI validates JSONL only; it does not run model inference, score model
-  outputs, or export reports from the command line.
-- The CLI registers only `prompt`, `response`, and legacy `evaluation` schemas
-  and validates files independently. Selected cross-record technical checks are
-  available through the separate typed Python API described above.
+- The commands validate stored JSONL and relationships; they do not run model
+  inference, generate scores, execute responses, or export reports.
+- `vi-en-eval` continues to register only `prompt`, `response`, and legacy
+  `evaluation` schemas for independent-file validation. `vi-en-dataset` is the
+  separate linked technical workflow.
 - Legacy general judgments retain one pair-level score set without candidate
   attribution; technical judgments have separate A/B assessments. Historical
   general numbers cannot be reconstructed as candidate ratings when their
