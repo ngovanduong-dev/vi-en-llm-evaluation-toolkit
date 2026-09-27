@@ -25,7 +25,7 @@ behavior, and agreement between observed evidence and stored rationales.
 Reproduce the evidence from the repository root:
 
 ```bash
-python -m pytest tests/test_technical_case_evidence.py
+python -m pytest tests/test_technical_case_evidence.py --no-cov
 ```
 
 Validate the linked files through the installed workflow:

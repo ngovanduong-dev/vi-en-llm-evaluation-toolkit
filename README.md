@@ -131,7 +131,7 @@ leakage, and stable deduplication with unhashable inputs. The
 minimal counterexample and committed reviewed fixture. Reproduce it with:
 
 ```bash
-python -m pytest tests/test_technical_case_evidence.py
+python -m pytest tests/test_technical_case_evidence.py --no-cov
 ```
 
 Candidate response strings remain inert data. The toolkit does not evaluate,
