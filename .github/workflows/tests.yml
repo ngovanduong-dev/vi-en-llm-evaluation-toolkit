@@ -145,6 +145,10 @@ jobs:
           python -m vi_en_eval.jsonl_validator data/sample_prompts.jsonl --schema prompt
           python -m vi_en_eval.jsonl_validator data/sample_responses.jsonl --schema response
           python -m vi_en_eval.jsonl_validator data/sample_evaluations.jsonl --schema evaluation
+          vi-en-dataset \
+            --prompts data/technical_python/prompts.jsonl \
+            --responses data/technical_python/response_pairs.jsonl \
+            --evaluations data/technical_python/technical_evaluations.jsonl
 
   build:
     runs-on: ubuntu-latest
@@ -176,6 +180,7 @@ jobs:
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/python" -m pip install dist/*.whl
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-eval" --help
+          "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-dataset" --help
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4

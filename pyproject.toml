@@ -39,6 +39,7 @@ dev = [
 
 [project.scripts]
 vi-en-eval = "vi_en_eval.jsonl_validator:main"
+vi-en-dataset = "vi_en_eval.technical_dataset:main"
 
 [project.urls]
 Homepage = "https://github.com/ngovanduong-dev/vi-en-llm-evaluation-toolkit"
