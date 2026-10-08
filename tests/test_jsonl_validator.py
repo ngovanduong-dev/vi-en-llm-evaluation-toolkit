@@ -1,12 +1,15 @@
+import gc
 import json
 import subprocess
 import sys
+import weakref
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from vi_en_eval.jsonl_validator import main, validate_jsonl
+from vi_en_eval.schemas import ResponsePairRecord
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> Path:
@@ -52,6 +55,45 @@ def test_valid_sample_evaluations_file_passes_validation():
     assert result.is_valid
     assert result.valid_records == 3
     assert result.issues == []
+
+
+def test_single_file_validation_releases_prior_large_models_during_parsing(tmp_path):
+    rows = [
+        {
+            "id": f"pair_{index}",
+            "prompt_id": "prompt_test_001",
+            "response_a": "A" * 65536,
+            "response_b": "B" * 65536,
+        }
+        for index in range(8)
+    ]
+    path = write_jsonl(tmp_path / "large_responses.jsonl", rows)
+    original_validate = ResponsePairRecord.model_validate
+
+    def validate_and_count_live_models():
+        seen_models = []
+        live_before_next_record = []
+
+        def track_model(payload):
+            gc.collect()
+            live_before_next_record.append(sum(ref() is not None for ref in seen_models))
+            record = original_validate(payload)
+            seen_models.append(weakref.ref(record))
+            return record
+
+        with patch.object(ResponsePairRecord, "model_validate", side_effect=track_model):
+            result = validate_jsonl(path, schema_name="response")
+
+        return result, live_before_next_record
+
+    for _ in range(2):
+        result, live_before_next_record = validate_and_count_live_models()
+        assert result.is_valid
+        assert result.total_lines == 8
+        assert result.valid_records == 8
+        assert result.issues == []
+        assert len(live_before_next_record) == 8
+        assert max(live_before_next_record) <= 1
 
 
 def test_validator_rejects_malformed_json(tmp_path):

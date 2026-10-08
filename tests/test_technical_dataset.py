@@ -69,6 +69,11 @@ def test_valid_linked_dataset_returns_typed_records():
     assert result.integrity_checked
     assert result.issues == ()
     assert result.dataset is not None
+    assert (
+        len(result.dataset.prompts),
+        len(result.dataset.response_pairs),
+        len(result.dataset.technical_evaluations),
+    ) == (3, 3, 3)
     assert all(isinstance(record, PromptRecord) for record in result.dataset.prompts)
     assert all(isinstance(record, ResponsePairRecord) for record in result.dataset.response_pairs)
     assert all(

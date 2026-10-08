@@ -138,7 +138,7 @@ def _load_collection(
 ) -> _CollectionLoad[_RecordT]:
     file_path = str(Path(path))
     try:
-        loaded = _load_typed_jsonl(path, record_type, model)
+        loaded = _load_typed_jsonl(path, record_type, model, collect_records=True)
     except UnicodeDecodeError:
         return _file_issue(
             record_type,

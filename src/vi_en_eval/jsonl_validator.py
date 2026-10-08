@@ -83,8 +83,10 @@ def _load_typed_jsonl(
     path: str | Path,
     schema_name: str,
     model: type[_ModelT],
+    *,
+    collect_records: bool,
 ) -> _TypedJsonlValidationResult[_ModelT]:
-    """Load typed JSONL records while applying the established file contract."""
+    """Validate JSONL, retaining typed records only when requested."""
     file_path = Path(path)
     issues: list[ValidationIssue] = []
     records: list[_ModelT] = []
@@ -143,7 +145,8 @@ def _load_typed_jsonl(
                 continue
 
             seen_ids.add(record_id)
-            records.append(record)
+            if collect_records:
+                records.append(record)
             valid_records += 1
 
     return _TypedJsonlValidationResult(
@@ -169,7 +172,9 @@ def validate_jsonl(path: str | Path, schema_name: str = "evaluation") -> JsonlVa
         allowed = ", ".join(sorted(SCHEMA_REGISTRY))
         raise ValueError(f"Unknown schema '{schema_name}'. Expected one of: {allowed}")
 
-    return _load_typed_jsonl(path, schema_name, SCHEMA_REGISTRY[schema_name]).validation
+    return _load_typed_jsonl(
+        path, schema_name, SCHEMA_REGISTRY[schema_name], collect_records=False
+    ).validation
 
 
 def format_validation_result(result: JsonlValidationResult) -> str:
