@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -308,7 +309,11 @@ def main(argv: list[str] | None = None) -> int:
         # legacy Windows code page or ASCII. Consumers recover the exact text.
         print(json.dumps(result.to_dict(), indent=2, ensure_ascii=True, allow_nan=False))
     else:
-        print(format_agreement_result(result))
+        # Escape only unencodable characters without reconfiguring the caller's
+        # stream. In-memory capture streams may have no encoding.
+        encoding = sys.stdout.encoding or "utf-8"
+        output = format_agreement_result(result)
+        print(output.encode(encoding, errors="backslashreplace").decode(encoding))
     return 0 if result.is_valid else 1
 
 

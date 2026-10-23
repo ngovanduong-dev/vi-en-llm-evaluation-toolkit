@@ -15,7 +15,9 @@ vi-en-compare --prompts prompts.jsonl --responses responses.jsonl --evaluations-
 python -m vi_en_eval.agreement --prompts prompts.jsonl --responses responses.jsonl --evaluations-a evaluator_a.jsonl --evaluations-b evaluator_b.jsonl
 ```
 
-Without `--json`, output is a concise coverage/agreement summary. With `--json`,
+Without `--json`, output is a concise coverage/agreement summary. Human-readable
+output escapes characters unsupported by stdout using Python
+backslash escapes; supported Unicode characters remain unchanged. With `--json`,
 stdout is one versioned JSON object. Exit codes follow the existing CLIs:
 
 | Code | Meaning |

@@ -1,8 +1,10 @@
+import io
 import json
 import os
 import shutil
 import subprocess
 import sys
+from contextlib import redirect_stdout
 from copy import deepcopy
 from pathlib import Path
 
@@ -406,7 +408,8 @@ def test_installed_command_and_module_execute_comparison(tmp_path):
         assert payload["comparison"]["winner_agreement"]["cohens_kappa"] is None
 
 
-def test_unicode_json_survives_ascii_stdout_and_round_trips(tmp_path):
+@pytest.mark.parametrize("encoding", ["ascii", "cp1252"])
+def test_unicode_json_survives_restricted_stdout_and_round_trips(tmp_path, encoding):
     paths = write_inputs(tmp_path, ["A"], ["B"])
     completed = subprocess.run(
         [
@@ -420,7 +423,7 @@ def test_unicode_json_survives_ascii_stdout_and_round_trips(tmp_path):
         capture_output=True,
         text=True,
         check=False,
-        env={**os.environ, "PYTHONIOENCODING": "ascii"},
+        env={**os.environ, "PYTHONIOENCODING": encoding},
     )
     assert completed.returncode == 0, completed.stderr
     report = json.loads(completed.stdout)
@@ -428,6 +431,84 @@ def test_unicode_json_survives_ascii_stdout_and_round_trips(tmp_path):
         report["comparison"]["matched_evaluations"][0]["rationales"]["evaluator_a"]["overall"]
         == "Đánh giá / overall-rationale-sentinel"
     )
+
+
+@pytest.mark.parametrize(
+    "encoding,displayed_name",
+    [
+        ("ascii", r"\u0111-\xe9-missing.jsonl"),
+        ("cp1252", "\\u0111-é-missing.jsonl"),
+        ("utf-8", "đ-é-missing.jsonl"),
+    ],
+)
+@pytest.mark.parametrize("valid", [False, True])
+def test_human_cli_handles_stdout_encoding(tmp_path, encoding, displayed_name, valid):
+    folder = Path("data/agreement_example").resolve()
+    paths = [
+        folder / name
+        for name in (
+            "prompts.jsonl",
+            "response_pairs.jsonl",
+            "evaluations_a.jsonl",
+            "evaluations_b.jsonl",
+        )
+    ]
+    if not valid:
+        paths[3] = tmp_path / "đ-é-missing.jsonl"
+    completed = subprocess.run(
+        [sys.executable, "-m", "vi_en_eval.agreement", *cli_args(paths)],
+        capture_output=True,
+        check=False,
+        env={**os.environ, "PYTHONIOENCODING": encoding},
+    )
+    assert completed.returncode == (0 if valid else 1)
+    assert completed.stderr == b""
+    output = completed.stdout.decode(encoding)
+    if valid:
+        assert output.startswith("VALID:") and "matched=6" in output
+    else:
+        assert output.startswith("INVALID:") and "file_read_error" in output
+        assert displayed_name in output
+
+
+def test_human_output_preserves_unicode_in_encodingless_capture(tmp_path):
+    paths = list(write_inputs(tmp_path, ["A"], ["B"]))
+    paths[3] = tmp_path / "đ-missing.jsonl"
+    output = io.StringIO()
+    with redirect_stdout(output):
+        assert main(cli_args(paths)) == 1
+    assert "đ-missing.jsonl" in output.getvalue()
+    assert output.encoding is None
+
+
+def test_evaluator_swap_transposes_matrix_without_changing_statistics(tmp_path):
+    paths = write_inputs(
+        tmp_path, ["A", "A", "A", "B", "Tie", "Tie"], ["A", "A", "B", "B", "A", "Tie"]
+    )
+    forward = compare_technical_evaluations(*paths).comparison["winner_agreement"]
+    swapped = compare_technical_evaluations(paths[0], paths[1], paths[3], paths[2]).comparison[
+        "winner_agreement"
+    ]
+    assert forward["confusion_matrix"] == [[2, 1, 0], [0, 1, 0], [1, 0, 1]]
+    assert swapped["confusion_matrix"] == [[2, 0, 1], [1, 1, 0], [0, 0, 1]]
+    for stats in (forward, swapped):
+        assert stats["observed_agreement"] == pytest.approx(2 / 3)
+        assert stats["cohens_kappa"] == pytest.approx(11 / 23)
+
+
+def test_evaluation_ids_shared_across_files_do_not_override_pair_identity(tmp_path):
+    paths = write_inputs(tmp_path, ["A", "B"], ["A", "B"])
+    rows = read_rows(paths[3])
+    # Same IDs in both files, deliberately assigned to different pairs.
+    rows[0]["id"], rows[1]["id"] = "a-1", "a-0"
+    write_rows(paths[3], list(reversed(rows)))
+    comparison = compare_technical_evaluations(*paths).comparison
+    assert comparison["winner_agreement"]["observed_agreement"] == 1
+    assert comparison["winner_agreement"]["cohens_kappa"] == 1
+    assert [
+        (r["response_pair_id"], r["evaluation_id_a"], r["evaluation_id_b"])
+        for r in comparison["matched_evaluations"]
+    ] == [("pair-0", "a-0", "a-1"), ("pair-1", "a-1", "a-0")]
 
 
 def test_bundled_example_matches_documented_arithmetic():

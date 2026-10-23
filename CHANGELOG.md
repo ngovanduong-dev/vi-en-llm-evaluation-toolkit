@@ -7,6 +7,11 @@ The project does not yet have a tagged release history.
 
 ## [Unreleased]
 
+### Fixed
+
+- Human-readable comparison diagnostics escape characters unsupported by stdout
+  instead of raising `UnicodeEncodeError`, including ASCII and CP1252 redirects.
+
 ### Added
 
 - An evaluator agreement inspector (`vi-en-compare` and Python API) with strict
