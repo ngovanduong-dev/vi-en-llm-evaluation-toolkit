@@ -7,8 +7,18 @@ The project does not yet have a tagged release history.
 
 ## [Unreleased]
 
+### Fixed
+
+- Human-readable comparison diagnostics escape characters unsupported by stdout
+  instead of raising `UnicodeEncodeError`, including ASCII and CP1252 redirects.
+
 ### Added
 
+- An evaluator agreement inspector (`vi-en-compare` and Python API) with strict
+  input validation, pair-identity joins, missing-coverage reporting, nominal
+  A/B/Tie confusion counts, unweighted Cohen's kappa, separate score differences,
+  and opt-in rationales. Includes a synthetic arithmetic example and versioned
+  JSON report documentation; existing loaders and rubrics are unchanged.
 - PEP 621 package metadata, an editable development extra, and the `vi-en-eval`
   console command.
 - Ruff, strict mypy, branch coverage, Bandit, dependency audit, and package build
