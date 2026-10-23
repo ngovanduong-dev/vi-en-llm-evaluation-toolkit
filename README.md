@@ -11,6 +11,9 @@ The installed `vi-en-eval` command exposes single-file JSONL validation. The
 additive `vi-en-dataset` command loads three linked technical collections,
 validates them as one dataset, and returns deterministic diagnostics. Scoring,
 report export, and coding-response checks are also available as Python APIs.
+The `vi-en-compare` command compares two technical evaluator datasets by stable
+response-pair ID, reporting coverage, winner agreement, Cohen's kappa, and
+separate rubric-score differences.
 
 ## What the Tool Does
 
@@ -141,6 +144,32 @@ coverage. Their winners, scores, rationales, and confidence values remain human
 evaluator judgments: schema and integrity success does not verify their semantic
 correctness, confidence is not calibrated probability, and no agreement,
 performance, or calibration claim follows from this dataset.
+
+### Evaluator Agreement & Disagreement Inspector
+
+Compare the bundled, deliberately simulated evaluator files:
+
+```bash
+vi-en-compare --prompts data/agreement_example/prompts.jsonl --responses data/agreement_example/response_pairs.jsonl --evaluations-a data/agreement_example/evaluations_a.jsonl --evaluations-b data/agreement_example/evaluations_b.jsonl --json
+```
+
+This example has 9 source pairs and 6 matched assessments, with winner agreement
+`4/6` and unweighted Cohen's kappa `11/23`. Missing assessments remain visible in
+coverage. Invalid references, records, and duplicate pair assessments suppress
+all metrics. Undefined statistics are `null`, including kappa when both
+evaluators use only the same label. Exit codes are `0` for valid comparisons,
+`1` for invalid input, and `2` for usage errors. Partial coverage and undefined
+statistics are valid results, not quality verdicts.
+
+Default JSON omits source text and rationales. Add `--include-rationales` with
+`--json` to include matched rationales, which may quote sensitive content.
+Winner agreement is distinct from rubric-score agreement and is not accuracy;
+stored confidence is not calibrated probability. These tiny synthetic examples
+do not establish evaluator reliability or independent human agreement.
+
+See the [comparison guide](docs/evaluator-agreement.md) for input contracts,
+the versioned JSON schema, formulas, privacy boundaries, Python API, and
+hand-verifiable example. Existing validation and rubric semantics are unchanged.
 
 ## Main Data Models
 
@@ -278,8 +307,9 @@ and build checks.
 
 ## Limitations
 
-- The commands validate stored JSONL and relationships; they do not run model
-  inference, generate scores, execute responses, or export reports.
+- The commands validate stored JSONL and relationships and compare technical
+  evaluator judgments; they do not run model inference, generate scores, or
+  execute responses. The comparison command emits JSON or a text summary.
 - `vi-en-eval` continues to register only `prompt`, `response`, and legacy
   `evaluation` schemas for independent-file validation. `vi-en-dataset` is the
   separate linked technical workflow.
@@ -288,8 +318,9 @@ and build checks.
   general numbers cannot be reconstructed as candidate ratings when their
   original scoring basis is unknown.
 - General score means and bands are descriptive. Technical evaluator confidence
-  is stored, not calibrated. There are no calibrated judges, agreement statistics,
-  statistical uncertainty estimates, or regression tests for model quality.
+  is stored, not calibrated. The comparison workflow reports descriptive
+  agreement statistics, but there are no calibrated judges, statistical
+  uncertainty estimates, or regression tests for model quality.
 - Individual-record validation and technical relationship checks do not establish
   the truth of a rationale, correct rubric use, or a supported winner. Missing
   source evidence must be addressed in the judgment itself.

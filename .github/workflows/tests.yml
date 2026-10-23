@@ -149,6 +149,11 @@ jobs:
             --prompts data/technical_python/prompts.jsonl \
             --responses data/technical_python/response_pairs.jsonl \
             --evaluations data/technical_python/technical_evaluations.jsonl
+          vi-en-compare \
+            --prompts data/agreement_example/prompts.jsonl \
+            --responses data/agreement_example/response_pairs.jsonl \
+            --evaluations-a data/agreement_example/evaluations_a.jsonl \
+            --evaluations-b data/agreement_example/evaluations_b.jsonl --json
 
   build:
     runs-on: ubuntu-latest
@@ -181,6 +186,7 @@ jobs:
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-eval" --help
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-dataset" --help
+          "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-compare" --help
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
