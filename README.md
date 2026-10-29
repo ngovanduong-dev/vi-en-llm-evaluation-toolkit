@@ -15,6 +15,11 @@ The `vi-en-compare` command compares two technical evaluator datasets by stable
 response-pair ID, reporting coverage, winner agreement, Cohen's kappa, and
 separate rubric-score differences.
 
+The additive `vi-en-grade` command verifies deterministic response constraints,
+compares reviewed Python candidates against fixtures, and calculates standalone
+Cohen's/Fleiss' kappa and position-swap consistency. Existing commands retain
+their validation-only behavior.
+
 ## What the Tool Does
 
 - Models prompts, response pairs, legacy general judgments, and technical A/B
@@ -62,6 +67,33 @@ python -m pip install -e .
 ```
 
 ## CLI Examples
+
+### Deterministic Verification and Calibration
+
+```bash
+vi-en-grade ifeval --response response.txt --constraints constraints.json
+vi-en-grade grade-ab --model-a a.py --model-b b.py --tests fixtures.py --function solve
+vi-en-grade kappa --ratings ratings.json
+vi-en-grade fleiss --ratings multi_ratings.json
+vi-en-grade swap-bias --pairs swaps.json
+```
+
+IFEval checks NFC/NFD normalization, lexical constraints, word and bullet counts,
+Markdown tables, and JSON payloads. Reports include English rationales tied to
+observed violations. The AST gate detects restricted references, missing type
+annotations, mutable defaults, and bare exception handlers, and reports a
+documented branch complexity estimate.
+
+Code comparison uses a separate `python -I -B` process, a clean environment,
+bounded captured output, and a configurable timeout. This is **not an OS sandbox**;
+run only reviewed candidates and fixtures, or supply external isolation as
+described in [SECURITY.md](SECURITY.md).
+
+See [verification and calibration](docs/verification-and-calibration.md) for
+JSON input formats, combined pipeline examples, Python APIs, ranking rules,
+statistical definitions, and limitations.
+
+### JSONL Validation
 
 Validate each bundled dataset against its registered schema:
 
@@ -307,7 +339,7 @@ and build checks.
 
 ## Limitations
 
-- The commands validate stored JSONL and relationships and compare technical
+- The dataset commands validate stored JSONL and relationships and compare technical
   evaluator judgments; they do not run model inference, generate scores, or
   execute responses. The comparison command emits JSON or a text summary.
 - `vi-en-eval` continues to register only `prompt`, `response`, and legacy
@@ -324,9 +356,10 @@ and build checks.
 - Individual-record validation and technical relationship checks do not establish
   the truth of a rationale, correct rubric use, or a supported winner. Missing
   source evidence must be addressed in the judgment itself.
-- Python checks use `ast.parse` only; successful AST construction does not prove
-  compilation or runtime correctness. Generated code is never executed, tested,
-  or sandboxed by the toolkit APIs or CLI.
+- The legacy `check_python_syntax` check uses `ast.parse`; AST construction alone does not prove
+  compilation or runtime correctness. Explicit fixture execution is available
+  separately through `vi-en-grade grade-ab`; it requires reviewed code or
+  externally managed isolation and does not establish general correctness.
 - The bundled records are small synthetic examples, not a representative
   benchmark or evidence of production model performance.
 

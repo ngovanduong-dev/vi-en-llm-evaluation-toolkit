@@ -187,6 +187,7 @@ jobs:
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-eval" --help
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-dataset" --help
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-compare" --help
+          "$RUNNER_TEMP/vi-en-eval-smoke/bin/vi-en-grade" --help
           "$RUNNER_TEMP/vi-en-eval-smoke/bin/python" -I \
             "$GITHUB_WORKSPACE/tests/wheel_smoke.py" \
             "$GITHUB_WORKSPACE/data/agreement_example"
